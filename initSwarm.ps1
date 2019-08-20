@@ -9,6 +9,8 @@ Invoke-Expression "docker pull stefanscherer/traefik-windows:v1.7.12" | Out-Null
 $ipaddress = (Get-NetIPAddress | Where-Object { $_.IPAddress.StartsWith("10.0.3") }).IPAddress
 $result = Invoke-Expression "docker swarm init --advertise-addr $ipaddress"
 
-if ($result -match "docker swarm join --token (?<Token>.+) ${ipaddress}:2377") {
-    Write-Host $Matches.Token
+if ([string]::Concat($result) -match "docker swarm join --token (?<Token>.+) ${ipaddress}:2377") {
+    Write-Host ("docker swarm join --token " + $matches.Token + " ${ipaddress}:2377")
+} else {
+    Write-Host "Swarm init has failed: $result"
 }
