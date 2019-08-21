@@ -15,15 +15,15 @@ param(
 # Traefik setup
 $traefikImg = "stefanscherer/traefik-windows:v1.7.12"
 New-Item -Path c:\traefik -ItemType Directory | Out-Null
-New-Item -Path c:\traefikforbc\my -ItemType Directory | Out-Null
-New-Item -Path c:\traefikforbc\config -ItemType Directory | Out-Null
-New-Item -Path c:\traefikforbc\config\acme.json | Out-Null
+New-Item -Path c:\traefik\my -ItemType Directory | Out-Null
+New-Item -Path c:\traefik\config -ItemType Directory | Out-Null
+New-Item -Path c:\traefik\config\acme.json | Out-Null
 Invoke-WebRequest -UseBasicParsing -Uri "https://raw.githubusercontent.com/tfenster/TraefikForBC/5c89ed4036457be3f531962e865916b7f4a539f9/template_traefik.toml" -OutFile c:\traefik\template_traefik.toml | Out-Null
 
 $externaldns = "$name.$location.cloudapp.azure.com"
 $template = Get-Content 'c:\traefik\template_traefik.toml' -Raw
 $expanded = Invoke-Expression "@`"`r`n$template`r`n`"@"
-$expanded | Out-File "c:\traefikforbc\config\traefik.toml" -Encoding ASCII
+$expanded | Out-File "c:\traefik\config\traefik.toml" -Encoding ASCII
 
 Invoke-Expression "docker pull $traefikImg" | Out-Null
 
