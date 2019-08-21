@@ -264,7 +264,7 @@
             "location": "[parameters('location')]",
             "dependsOn": [
                 "[concat('Microsoft.Network/networkInterfaces/', parameters('networkInterfaceNameNode'), '-', copyIndex())]",
-                "[concat(parameters('virtualMachineNameMgr'),'/script1')]"
+                "[resourceId('Microsoft.Compute/virtualMachines/extensions/', parameters('virtualMachineNameMgr'), 'script1')]"
             ],
             "properties": {
                 "hardwareProfile": {
