@@ -332,7 +332,7 @@
         {
             "type": "Microsoft.Compute/virtualMachines/extensions",
             "apiVersion": "2015-06-15",
-            "name": "[concat(parameters('virtualMachineNameNode'),'/script1', '-', copyIndex())]",
+            "name": "[concat(parameters('virtualMachineNameNode'), '-', copyIndex(),'/script1')]",
             "dependsOn": [
                 "[concat('Microsoft.Compute/virtualMachines/', parameters('virtualMachineNameNode'), '-', copyIndex())]"
             ],
@@ -348,7 +348,7 @@
                     ]
                 },
                 "protectedSettings": {
-                    "commandToExecute": "[concat('powershell -ExecutionPolicy Unrestricted -File joinSwarm.ps1 -joinCommand ', reference(resourceId('Microsoft.Compute/virtualMachines/extensions', parameters('virtualMachineNameMgr'), 'script1')).instanceView.substatuses[0].message, ' -images ', parameters('images'))]"
+                    "commandToExecute": "[concat('powershell -ExecutionPolicy Unrestricted -File joinSwarm.ps1 -images \"', parameters('images'), '\" -joinCommand \"', reference(resourceId('Microsoft.Compute/virtualMachines/extensions', parameters('virtualMachineNameMgr'), 'script1')).instanceView.substatuses[0].message, '\"')]"
                   }
             },
             "copy": {
@@ -358,13 +358,5 @@
         }
     ],
     "outputs": {
-        "returnValue": {
-            "type": "string",
-            "value": "[reference(resourceId('Microsoft.Compute/virtualMachines/extensions', parameters('virtualMachineNameMgr'), 'script1')).instanceView.substatuses[0].message]"
-        },
-        "instanceView": {
-      "value": "[reference(resourceId('Microsoft.Compute/virtualMachines/extensions', parameters('virtualMachineNameMgr'), 'script1')).instanceView]",
-      "type": "object"
-    }
     }
 }
