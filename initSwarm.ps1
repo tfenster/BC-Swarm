@@ -37,7 +37,7 @@ $result = Invoke-Expression "docker swarm init --advertise-addr $ipaddress"
 if ([string]::Concat($result) -match "docker swarm join --token (?<Token>.+) ${ipaddress}:2377") {
     Write-Host ("docker swarm join --token " + $matches.Token + " ${ipaddress}:2377")
     Invoke-Expression "docker network create --driver=overlay traefik-public" | Out-Null
-    Invoke-Expression "docker service create --name traefik --publish 80:80 --publish 443:443 --publish 8080:8080 --mount type=bind,source=c:/traefik/config,target=c:/etc/traefik --mount type=npipe,source=\\.\pipe\docker_engine,target=\\.\pipe\docker_engine --network traefik-public --label ""traefik.enable=true"" --label ""traefik.port=8080"" $traefikImg" | Out-Null
+    Invoke-Expression "docker service create --name traefik --publish 80:80 --publish 443:443 --publish 8080:8080 --mount type=bind,source=c:/traefik/config,target=c:/etc/traefik --mount type=npipe,source=\\.\pipe\docker_engine,target=\\.\pipe\docker_engine --network traefik-public --label ""traefik.enable=true"" --label ""traefik.port=8080"" --constraint ""node.role==manager"" $traefikImg" | Out-Null
 } else {
     Write-Host "Swarm init has failed: $result"
 }
