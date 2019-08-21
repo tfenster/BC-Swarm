@@ -39,11 +39,19 @@ param(
 
  [Parameter(Mandatory=$True)]
  [string]
- $deploymentName,
+ $name,
+
+ [Parameter(Mandatory=$True)]
+ [securestring]
+ $adminPassword,
 
  [Parameter(Mandatory=$True)]
  [string]
- $managerVmName,
+ $email,
+
+ [Parameter(Mandatory=$False)]
+ [string]
+ $managerVmName = "mgr",
 
  [Parameter(Mandatory=$False)]
  [string]
@@ -51,11 +59,7 @@ param(
 
  [Parameter(Mandatory=$False)]
  [string]
- $adminUser = "VM-Administrator",
-
- [Parameter(Mandatory=$True)]
- [securestring]
- $adminPassword
+ $adminUser = "VM-Administrator"
 
 )
 
@@ -149,4 +153,4 @@ else{
 
 # Start the deployment
 Write-Host "Starting deployment...";
-New-AzureRmResourceGroupDeployment -ResourceGroupName $resourceGroupName -Name $deploymentName -TemplateFile .\template.json -TemplateParameterFile .\parameters.json -location $location -adminPassword $adminPassword -adminUsername $adminUser -virtualMachineName $managerVmName -publicIpAddressName "${managerVmName}-ip" -networkInterfaceName "${managerVmName}-ni" -virtualNetworkName "${resourceGroupName}-vnet" -networkSecurityGroupName "${managerVmName}-nsg" -virtualMachineSize $managerVmSize
+New-AzureRmResourceGroupDeployment -ResourceGroupName $resourceGroupName -Name "$name-deployment" -TemplateFile .\template.json -TemplateParameterFile .\parameters.json -location $location -adminPassword $adminPassword -adminUsername $adminUser -virtualMachineName "$managerVmName" -publicIpAddressName "${managerVmName}-ip" -networkInterfaceName "${managerVmName}-ni" -virtualNetworkName "${resourceGroupName}-vnet" -networkSecurityGroupName "${managerVmName}-nsg" -virtualMachineSize $managerVmSize -dnsLabelPrefix "$name-swarm" -email $email

@@ -35,6 +35,9 @@
         "publicIpAddressSku": {
             "type": "string"
         },
+        "dnsLabelPrefix": {
+            "type": "string"
+        },
         "virtualMachineName": {
             "type": "string"
         },
@@ -49,6 +52,9 @@
         },
         "adminPassword": {
             "type": "securestring"
+        },
+        "email": {
+            "type": "string"
         }
     },
     "variables": {
@@ -117,7 +123,10 @@
                 "name": "[parameters('publicIpAddressSku')]"
             },
             "properties": {
-                "publicIpAllocationMethod": "[parameters('publicIpAddressType')]"
+                "publicIpAllocationMethod": "[parameters('publicIpAddressType')]",
+                "dnsSettings": {
+                    "domainNameLabel": "[parameters('dnsLabelPrefix')]"
+                }
             }
         },
         {
@@ -192,7 +201,7 @@
                 },
 
                 "protectedSettings": {
-                    "commandToExecute": "powershell -ExecutionPolicy Unrestricted -File initSwarm.ps1"
+                    "commandToExecute": "[concat('powershell -ExecutionPolicy Unrestricted -File initSwarm.ps1 -location ', parameters('location'), ' -name ', parameters('dnsLabelPrefix'), ' -email ', parameters('email'))]"
                   }
 
             }
