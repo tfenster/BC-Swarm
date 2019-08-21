@@ -348,7 +348,7 @@
                     ]
                 },
                 "protectedSettings": {
-                    "commandToExecute": "[concat('powershell -ExecutionPolicy Unrestricted -File joinSwarm.ps1 -joinCommand ', reference(resourceId('Microsoft.Compute/virtualMachines/extensions', parameters('virtualMachineNameMgr'), 'script1')).instanceView.substatuses[0].message, ' -iamges ', parameters('images'))]"
+                    "commandToExecute": "[concat('powershell -ExecutionPolicy Unrestricted -File joinSwarm.ps1 -joinCommand ', reference(resourceId('Microsoft.Compute/virtualMachines/extensions', parameters('virtualMachineNameMgr'), 'script1')).instanceView.substatuses[0].message, ' -images ', parameters('images'))]"
                   }
             },
             "copy": {
