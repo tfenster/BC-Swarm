@@ -55,6 +55,10 @@ param(
 
  [Parameter(Mandatory=$False)]
  [string]
+ $images = "",
+
+ [Parameter(Mandatory=$False)]
+ [string]
  $managerVmName = "mgr",
 
  [Parameter(Mandatory=$False)]
@@ -165,4 +169,4 @@ else{
 
 # Start the deployment
 Write-Host "Starting deployment...";
-New-AzureRmResourceGroupDeployment -ResourceGroupName $resourceGroupName -Name "$name-deployment" -TemplateFile .\template.json -TemplateParameterFile .\parameters.json -location $location -adminPassword $adminPassword -adminUsername $adminUser -virtualNetworkName "${resourceGroupName}-vnet" -dnsLabelPrefix "$name-swarm" -email $email -count $numberOfNodes -virtualMachineNameMgr "$managerVmName" -publicIpAddressNameMgr "${managerVmName}-ip" -networkInterfaceNameMgr "${managerVmName}-ni" -networkSecurityGroupNameMgr "${managerVmName}-nsg" -virtualMachineSizeMgr $managerVmSize -virtualMachineNameNode "$nodeVmName" -publicIpAddressNameNode "${nodeVmName}-ip" -networkInterfaceNameNode "${nodeVmName}-ni" -networkSecurityGroupNameNode "${nodeVmName}-nsg" -virtualMachineSizeNode $nodeVmSize 
+New-AzureRmResourceGroupDeployment -ResourceGroupName $resourceGroupName -Name "$name-deployment" -TemplateFile .\template.json -TemplateParameterFile .\parameters.json -location $location -adminPassword $adminPassword -adminUsername $adminUser -virtualNetworkName "${resourceGroupName}-vnet" -dnsLabelPrefix "$name-swarm" -email $email -count $numberOfNodes -images $images -virtualMachineNameMgr "$managerVmName" -publicIpAddressNameMgr "${managerVmName}-ip" -networkInterfaceNameMgr "${managerVmName}-ni" -networkSecurityGroupNameMgr "${managerVmName}-nsg" -virtualMachineSizeMgr $managerVmSize -virtualMachineNameNode "$nodeVmName" -publicIpAddressNameNode "${nodeVmName}-ip" -networkInterfaceNameNode "${nodeVmName}-ni" -networkSecurityGroupNameNode "${nodeVmName}-nsg" -virtualMachineSizeNode $nodeVmSize 
