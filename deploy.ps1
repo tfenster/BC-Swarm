@@ -59,6 +59,14 @@ param(
 
  [Parameter(Mandatory=$False)]
  [string]
+ $nodeVmName = "node",
+
+ [Parameter(Mandatory=$False)]
+ [string]
+ $nodeVmSize = "Standard_D4s_v3",
+
+ [Parameter(Mandatory=$False)]
+ [string]
  $adminUser = "VM-Administrator"
 
 )
@@ -153,4 +161,4 @@ else{
 
 # Start the deployment
 Write-Host "Starting deployment...";
-New-AzureRmResourceGroupDeployment -ResourceGroupName $resourceGroupName -Name "$name-deployment" -TemplateFile .\template.json -TemplateParameterFile .\parameters.json -location $location -adminPassword $adminPassword -adminUsername $adminUser -virtualMachineName "$managerVmName" -publicIpAddressName "${managerVmName}-ip" -networkInterfaceName "${managerVmName}-ni" -virtualNetworkName "${resourceGroupName}-vnet" -networkSecurityGroupName "${managerVmName}-nsg" -virtualMachineSize $managerVmSize -dnsLabelPrefix "$name-swarm" -email $email
+New-AzureRmResourceGroupDeployment -ResourceGroupName $resourceGroupName -Name "$name-deployment" -TemplateFile .\template.json -TemplateParameterFile .\parameters.json -location $location -adminPassword $adminPassword -adminUsername $adminUser -virtualNetworkName "${resourceGroupName}-vnet" -dnsLabelPrefix "$name-swarm" -email $email -count 3 -virtualMachineNameMgr "$managerVmName" -publicIpAddressNameMgr "${managerVmName}-ip" -networkInterfaceNameMgr "${managerVmName}-ni" -networkSecurityGroupNameMgr "${managerVmName}-nsg" -virtualMachineSizeMgr $managerVmSize -virtualMachineNameNode "$nodeVmName" -publicIpAddressNameNode "${nodeVmName}-ip" -networkInterfaceNameNode "${nodeVmName}-ni" -networkSecurityGroupNameNode "${nodeVmName}-nsg" -virtualMachineSizeNode $nodeVmSize 

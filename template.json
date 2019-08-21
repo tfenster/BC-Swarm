@@ -5,13 +5,22 @@
         "location": {
             "type": "string"
         },
-        "networkInterfaceName": {
+        "networkInterfaceNameMgr": {
             "type": "string"
         },
-        "networkSecurityGroupName": {
+        "networkInterfaceNameNode": {
             "type": "string"
         },
-        "networkSecurityGroupRules": {
+        "networkSecurityGroupNameMgr": {
+            "type": "string"
+        },
+        "networkSecurityGroupNameNode": {
+            "type": "string"
+        },
+        "networkSecurityGroupRulesMgr": {
+            "type": "array"
+        },
+        "networkSecurityGroupRulesNode": {
             "type": "array"
         },
         "subnetName": {
@@ -26,7 +35,10 @@
         "subnets": {
             "type": "array"
         },
-        "publicIpAddressName": {
+        "publicIpAddressNameMgr": {
+            "type": "string"
+        },
+        "publicIpAddressNameNode": {
             "type": "string"
         },
         "publicIpAddressType": {
@@ -38,13 +50,19 @@
         "dnsLabelPrefix": {
             "type": "string"
         },
-        "virtualMachineName": {
+        "virtualMachineNameMgr": {
+            "type": "string"
+        },
+        "virtualMachineNameNode": {
             "type": "string"
         },
         "osDiskType": {
             "type": "string"
         },
-        "virtualMachineSize": {
+        "virtualMachineSizeMgr": {
+            "type": "string"
+        },
+        "virtualMachineSizeNode": {
             "type": "string"
         },
         "adminUsername": {
@@ -55,10 +73,17 @@
         },
         "email": {
             "type": "string"
+        },
+        "count": {
+            "type": "int"
+        },
+        "images": {
+            "type": "string"
         }
     },
     "variables": {
-        "nsgId": "[resourceId(resourceGroup().name, 'Microsoft.Network/networkSecurityGroups', parameters('networkSecurityGroupName'))]",
+        "nsgIdMgr": "[resourceId(resourceGroup().name, 'Microsoft.Network/networkSecurityGroups', parameters('networkSecurityGroupNameMgr'))]",
+        "nsgIdNode": "[resourceId(resourceGroup().name, 'Microsoft.Network/networkSecurityGroups', parameters('networkSecurityGroupNameNode'))]",
         "vnetId": "[resourceId(resourceGroup().name,'Microsoft.Network/virtualNetworks', parameters('virtualNetworkName'))]",
         "subnetRef": "[concat(variables('vnetId'), '/subnets/', parameters('subnetName'))]"
     },
@@ -66,12 +91,12 @@
         {
             "type": "Microsoft.Network/networkInterfaces",
             "apiVersion": "2018-10-01",
-            "name": "[parameters('networkInterfaceName')]",
+            "name": "[parameters('networkInterfaceNameMgr')]",
             "location": "[parameters('location')]",
             "dependsOn": [
-                "[concat('Microsoft.Network/networkSecurityGroups/', parameters('networkSecurityGroupName'))]",
+                "[concat('Microsoft.Network/networkSecurityGroups/', parameters('networkSecurityGroupNameMgr'))]",
                 "[concat('Microsoft.Network/virtualNetworks/', parameters('virtualNetworkName'))]",
-                "[concat('Microsoft.Network/publicIpAddresses/', parameters('publicIpAddressName'))]"
+                "[concat('Microsoft.Network/publicIpAddresses/', parameters('publicIpAddressNameMgr'))]"
             ],
             "properties": {
                 "ipConfigurations": [
@@ -83,23 +108,66 @@
                             },
                             "privateIPAllocationMethod": "Dynamic",
                             "publicIpAddress": {
-                                "id": "[resourceId(resourceGroup().name, 'Microsoft.Network/publicIpAddresses', parameters('publicIpAddressName'))]"
+                                "id": "[resourceId(resourceGroup().name, 'Microsoft.Network/publicIpAddresses', parameters('publicIpAddressNameMgr'))]"
                             }
                         }
                     }
                 ],
                 "networkSecurityGroup": {
-                    "id": "[variables('nsgId')]"
+                    "id": "[variables('nsgIdMgr')]"
                 }
+            }
+        },
+        {
+            "type": "Microsoft.Network/networkInterfaces",
+            "apiVersion": "2018-10-01",
+            "name": "[concat(parameters('networkInterfaceNameNode'), '-', copyIndex())]",
+            "location": "[parameters('location')]",
+            "dependsOn": [
+                "[concat('Microsoft.Network/networkSecurityGroups/', parameters('networkSecurityGroupNameNode'))]",
+                "[concat('Microsoft.Network/virtualNetworks/', parameters('virtualNetworkName'))]",
+                "[concat('Microsoft.Network/publicIpAddresses/', parameters('publicIpAddressNameNode'), '-', copyIndex())]"
+            ],
+            "properties": {
+                "ipConfigurations": [
+                    {
+                        "name": "ipconfig1",
+                        "properties": {
+                            "subnet": {
+                                "id": "[variables('subnetRef')]"
+                            },
+                            "privateIPAllocationMethod": "Dynamic",
+                            "publicIpAddress": {
+                                "id": "[resourceId(resourceGroup().name, 'Microsoft.Network/publicIpAddresses', concat(parameters('publicIpAddressNameNode'), '-', copyIndex()))]"
+                            }
+                        }
+                    }
+                ],
+                "networkSecurityGroup": {
+                    "id": "[variables('nsgIdNode')]"
+                }
+            },
+            "copy": {
+                "name": "niccopy",
+                "count": "[parameters('count')]"
             }
         },
         {
             "type": "Microsoft.Network/networkSecurityGroups",
             "apiVersion": "2019-02-01",
-            "name": "[parameters('networkSecurityGroupName')]",
+            "name": "[parameters('networkSecurityGroupNameMgr')]",
             "location": "[parameters('location')]",
             "properties": {
-                "securityRules": "[parameters('networkSecurityGroupRules')]"
+                "securityRules": "[parameters('networkSecurityGroupRulesMgr')]"
+            }
+        },
+        {
+            "type": "Microsoft.Network/networkSecurityGroups",
+            "apiVersion": "2019-02-01",
+            "name": "[parameters('networkSecurityGroupNameNode')]",
+            "location": "[parameters('location')]",
+            "properties": {
+                "securityRules": "[parameters('networkSecurityGroupRulesNode')]"
             }
         },
         {
@@ -117,7 +185,7 @@
         {
             "type": "Microsoft.Network/publicIpAddresses",
             "apiVersion": "2019-02-01",
-            "name": "[parameters('publicIpAddressName')]",
+            "name": "[parameters('publicIpAddressNameMgr')]",
             "location": "[parameters('location')]",
             "sku": {
                 "name": "[parameters('publicIpAddressSku')]"
@@ -130,16 +198,32 @@
             }
         },
         {
+            "type": "Microsoft.Network/publicIpAddresses",
+            "apiVersion": "2019-02-01",
+            "name": "[concat(parameters('publicIpAddressNameNode'), '-', copyIndex())]",
+            "location": "[parameters('location')]",
+            "sku": {
+                "name": "[parameters('publicIpAddressSku')]"
+            },
+            "properties": {
+                "publicIpAllocationMethod": "[parameters('publicIpAddressType')]"
+            },
+            "copy": {
+                "name": "pipcopy",
+                "count": "[parameters('count')]"
+            }
+        },
+        {
             "type": "Microsoft.Compute/virtualMachines",
             "apiVersion": "2018-10-01",
-            "name": "[parameters('virtualMachineName')]",
+            "name": "[parameters('virtualMachineNameMgr')]",
             "location": "[parameters('location')]",
             "dependsOn": [
-                "[concat('Microsoft.Network/networkInterfaces/', parameters('networkInterfaceName'))]"
+                "[concat('Microsoft.Network/networkInterfaces/', parameters('networkInterfaceNameMgr'))]"
             ],
             "properties": {
                 "hardwareProfile": {
-                    "vmSize": "[parameters('virtualMachineSize')]"
+                    "vmSize": "[parameters('virtualMachineSizeMgr')]"
                 },
                 "storageProfile": {
                     "osDisk": {
@@ -158,12 +242,12 @@
                 "networkProfile": {
                     "networkInterfaces": [
                         {
-                            "id": "[resourceId('Microsoft.Network/networkInterfaces', parameters('networkInterfaceName'))]"
+                            "id": "[resourceId('Microsoft.Network/networkInterfaces', parameters('networkInterfaceNameMgr'))]"
                         }
                     ]
                 },
                 "osProfile": {
-                    "computerName": "[parameters('virtualMachineName')]",
+                    "computerName": "[parameters('virtualMachineNameMgr')]",
                     "adminUsername": "[parameters('adminUsername')]",
                     "adminPassword": "[parameters('adminPassword')]",
                     "windowsConfiguration": {
@@ -174,46 +258,112 @@
             }
         },
         {
+            "type": "Microsoft.Compute/virtualMachines",
+            "apiVersion": "2018-10-01",
+            "name": "[concat(parameters('virtualMachineNameNode'), '-', copyIndex())]",
+            "location": "[parameters('location')]",
+            "dependsOn": [
+                "[concat('Microsoft.Network/networkInterfaces/', parameters('networkInterfaceNameNode'), '-', copyIndex())]",
+                "[concat(parameters('virtualMachineNameMgr'),'/script1')]"
+            ],
+            "properties": {
+                "hardwareProfile": {
+                    "vmSize": "[parameters('virtualMachineSizeNode')]"
+                },
+                "storageProfile": {
+                    "osDisk": {
+                        "createOption": "FromImage",
+                        "managedDisk": {
+                            "storageAccountType": "[parameters('osDiskType')]"
+                        }
+                    },
+                    "imageReference": {
+                        "publisher": "MicrosoftWindowsServer",
+                        "offer": "WindowsServer",
+                        "sku": "2019-Datacenter-with-Containers",
+                        "version": "latest"
+                    }
+                },
+                "networkProfile": {
+                    "networkInterfaces": [
+                        {
+                            "id": "[resourceId('Microsoft.Network/networkInterfaces', concat(parameters('networkInterfaceNameNode'), '-', copyIndex()))]"
+                        }
+                    ]
+                },
+                "osProfile": {
+                    "computerName": "[concat(parameters('virtualMachineNameNode'), '-', copyIndex())]",
+                    "adminUsername": "[parameters('adminUsername')]",
+                    "adminPassword": "[parameters('adminPassword')]",
+                    "windowsConfiguration": {
+                        "enableAutomaticUpdates": true,
+                        "provisionVmAgent": true
+                    }
+                }
+            },
+            "copy": {
+                "name": "vmcopy",
+                "count": "[parameters('count')]"
+            }
+        },
+        {
             "type": "Microsoft.Compute/virtualMachines/extensions",
             "apiVersion": "2015-06-15",
-            "name": "[concat(parameters('virtualMachineName'),'/script1')]",
+            "name": "[concat(parameters('virtualMachineNameMgr'),'/script1')]",
             "dependsOn": [
-                "[concat('Microsoft.Compute/virtualMachines/', parameters('virtualMachineName'))]"
+                "[concat('Microsoft.Compute/virtualMachines/', parameters('virtualMachineNameMgr'))]"
             ],
             "location": "[resourceGroup().location]",
             "properties": {
-
                 "publisher": "Microsoft.Compute",
-
                 "type": "CustomScriptExtension",
-
                 "typeHandlerVersion": "1.9",
-
                 "autoUpgradeMinorVersion": true,
-
                 "settings": {
-
                     "fileUris": [
-
                         "https://raw.githubusercontent.com/tfenster/BC-Swarm/master/initSwarm.ps1"
-
                     ]
                 },
-
                 "protectedSettings": {
-                    "commandToExecute": "[concat('powershell -ExecutionPolicy Unrestricted -File initSwarm.ps1 -externaldns ', reference(parameters('publicIPAddressName')).dnsSettings.fqdn, ' -email ', parameters('email'))]"
+                    "commandToExecute": "[concat('powershell -ExecutionPolicy Unrestricted -File initSwarm.ps1 -externaldns ', reference(parameters('publicIPAddressNameMgr')).dnsSettings.fqdn, ' -email ', parameters('email'))]"
                   }
-
+            }
+        },
+        {
+            "type": "Microsoft.Compute/virtualMachines/extensions",
+            "apiVersion": "2015-06-15",
+            "name": "[concat(parameters('virtualMachineNameNode'),'/script1', '-', copyIndex())]",
+            "dependsOn": [
+                "[concat('Microsoft.Compute/virtualMachines/', parameters('virtualMachineNameNode'), '-', copyIndex())]"
+            ],
+            "location": "[resourceGroup().location]",
+            "properties": {
+                "publisher": "Microsoft.Compute",
+                "type": "CustomScriptExtension",
+                "typeHandlerVersion": "1.9",
+                "autoUpgradeMinorVersion": true,
+                "settings": {
+                    "fileUris": [
+                        "https://raw.githubusercontent.com/tfenster/BC-Swarm/master/joinSwarm.ps1"
+                    ]
+                },
+                "protectedSettings": {
+                    "commandToExecute": "[concat('powershell -ExecutionPolicy Unrestricted -File joinSwarm.ps1 -joinCommand ', reference(resourceId('Microsoft.Compute/virtualMachines/extensions', parameters('virtualMachineNameMgr'), 'script1')).instanceView.substatuses[0].message, ' -iamges ', parameters('images'))]"
+                  }
+            },
+            "copy": {
+                "name": "extcopy",
+                "count": "[parameters('count')]"
             }
         }
     ],
     "outputs": {
         "returnValue": {
             "type": "string",
-            "value": "[reference(resourceId('Microsoft.Compute/virtualMachines/extensions', parameters('virtualMachineName'), 'script1')).instanceView.substatuses[0].message]"
+            "value": "[reference(resourceId('Microsoft.Compute/virtualMachines/extensions', parameters('virtualMachineNameMgr'), 'script1')).instanceView.substatuses[0].message]"
         },
         "instanceView": {
-      "value": "[reference(resourceId('Microsoft.Compute/virtualMachines/extensions', parameters('virtualMachineName'), 'script1')).instanceView]",
+      "value": "[reference(resourceId('Microsoft.Compute/virtualMachines/extensions', parameters('virtualMachineNameMgr'), 'script1')).instanceView]",
       "type": "object"
     }
     }
