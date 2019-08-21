@@ -201,7 +201,7 @@
                 },
 
                 "protectedSettings": {
-                    "commandToExecute": "[concat('powershell -ExecutionPolicy Unrestricted -File initSwarm.ps1 -location ', parameters('location'), ' -name ', parameters('dnsLabelPrefix'), ' -email ', parameters('email'))]"
+                    "commandToExecute": "[concat('powershell -ExecutionPolicy Unrestricted -File initSwarm.ps1 -externaldns ', reference(parameters('publicIPAddressName')).dnsSettings.fqdn, ' -email ', parameters('email'))]"
                   }
 
             }

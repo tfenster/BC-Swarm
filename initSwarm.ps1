@@ -1,11 +1,7 @@
 param(
  [Parameter(Mandatory=$True)]
  [string]
- $location,
-
- [Parameter(Mandatory=$True)]
- [string]
- $name,
+ $externaldns,
 
  [Parameter(Mandatory=$True)]
  [string]
@@ -20,7 +16,6 @@ New-Item -Path c:\traefik\config -ItemType Directory | Out-Null
 New-Item -Path c:\traefik\config\acme.json | Out-Null
 Invoke-WebRequest -UseBasicParsing -Uri "https://raw.githubusercontent.com/tfenster/BC-Swarm/master/template_traefik.toml" -OutFile c:\traefik\template_traefik.toml | Out-Null
 
-$externaldns = "$name.$location.cloudapp.azure.com"
 $template = Get-Content 'c:\traefik\template_traefik.toml' -Raw
 $expanded = Invoke-Expression "@`"`r`n$template`r`n`"@"
 $expanded | Out-File "c:\traefik\config\traefik.toml" -Encoding ASCII
