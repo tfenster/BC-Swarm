@@ -140,8 +140,8 @@ Function ConvertPSObjectToHashtable
 $ErrorActionPreference = "Stop"
 
 # sign in
-#Write-Host "Logging in...";
-#Login-AzureRmAccount;
+Write-Host "Logging in...";
+Login-AzureRmAccount;
 
 # select subscription
 Write-Host "Selecting subscription '$subscriptionName'";
@@ -152,7 +152,7 @@ $resourceProviders = @("microsoft.network","microsoft.compute","microsoft.devtes
 if($resourceProviders.length) {
     Write-Host "Registering resource providers"
     foreach($resourceProvider in $resourceProviders) {
-        #RegisterRP($resourceProvider);
+        RegisterRP($resourceProvider);
     }
 }
 
