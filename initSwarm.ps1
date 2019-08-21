@@ -18,7 +18,7 @@ New-Item -Path c:\traefik -ItemType Directory | Out-Null
 New-Item -Path c:\traefik\my -ItemType Directory | Out-Null
 New-Item -Path c:\traefik\config -ItemType Directory | Out-Null
 New-Item -Path c:\traefik\config\acme.json | Out-Null
-Invoke-WebRequest -UseBasicParsing -Uri "https://raw.githubusercontent.com/tfenster/TraefikForBC/5c89ed4036457be3f531962e865916b7f4a539f9/template_traefik.toml" -OutFile c:\traefik\template_traefik.toml | Out-Null
+Invoke-WebRequest -UseBasicParsing -Uri "https://raw.githubusercontent.com/tfenster/BC-Swarm/master/template_traefik.toml" -OutFile c:\traefik\template_traefik.toml | Out-Null
 
 $externaldns = "$name.$location.cloudapp.azure.com"
 $template = Get-Content 'c:\traefik\template_traefik.toml' -Raw
