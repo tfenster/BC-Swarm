@@ -263,8 +263,7 @@
             "name": "[concat(parameters('virtualMachineNameNode'), '-', copyIndex())]",
             "location": "[parameters('location')]",
             "dependsOn": [
-                "[concat('Microsoft.Network/networkInterfaces/', parameters('networkInterfaceNameNode'), '-', copyIndex())]",
-                "[resourceId('Microsoft.Compute/virtualMachines/extensions/', parameters('virtualMachineNameMgr'), 'script1')]"
+                "[concat('Microsoft.Network/networkInterfaces/', parameters('networkInterfaceNameNode'), '-', copyIndex())]"
             ],
             "properties": {
                 "hardwareProfile": {
@@ -334,7 +333,8 @@
             "apiVersion": "2015-06-15",
             "name": "[concat(parameters('virtualMachineNameNode'), '-', copyIndex(),'/script1')]",
             "dependsOn": [
-                "[concat('Microsoft.Compute/virtualMachines/', parameters('virtualMachineNameNode'), '-', copyIndex())]"
+                "[concat('Microsoft.Compute/virtualMachines/', parameters('virtualMachineNameNode'), '-', copyIndex())]",
+                "[resourceId('Microsoft.Compute/virtualMachines/extensions/', parameters('virtualMachineNameMgr'), 'script1')]"
             ],
             "location": "[resourceGroup().location]",
             "properties": {
