@@ -183,7 +183,7 @@
             }
         },
         {
-            "type": "Microsoft.Network/publicIpAddresses",
+            "type": "Microsoft.Network/publicIPAddresses",
             "apiVersion": "2019-02-01",
             "name": "[parameters('publicIpAddressNameMgr')]",
             "location": "[parameters('location')]",
@@ -191,14 +191,14 @@
                 "name": "[parameters('publicIpAddressSku')]"
             },
             "properties": {
-                "publicIpAllocationMethod": "[parameters('publicIpAddressType')]",
+                "publicIPAllocationMethod": "[parameters('publicIpAddressType')]",
                 "dnsSettings": {
                     "domainNameLabel": "[parameters('dnsLabelPrefix')]"
                 }
             }
         },
         {
-            "type": "Microsoft.Network/publicIpAddresses",
+            "type": "Microsoft.Network/publicIPAddresses",
             "apiVersion": "2019-02-01",
             "name": "[concat(parameters('publicIpAddressNameNode'), '-', copyIndex())]",
             "location": "[parameters('location')]",
@@ -206,7 +206,7 @@
                 "name": "[parameters('publicIpAddressSku')]"
             },
             "properties": {
-                "publicIpAllocationMethod": "[parameters('publicIpAddressType')]"
+                "publicIPAllocationMethod": "[parameters('publicIpAddressType')]"
             },
             "copy": {
                 "name": "pipcopy",
