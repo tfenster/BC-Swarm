@@ -13,7 +13,7 @@ $traefikImg = "stefanscherer/traefik-windows:v1.7.12"
 New-Item -Path c:\traefik -ItemType Directory | Out-Null
 New-Item -Path c:\traefik\config -ItemType Directory | Out-Null
 New-Item -Path c:\traefik\config\acme.json | Out-Null
-Invoke-WebRequest -UseBasicParsing -Uri "https://raw.githubusercontent.com/tfenster/BC-Swarm/master/template_traefik.toml" -OutFile c:\traefik\template_traefik.toml | Out-Null
+Invoke-WebRequest -UseBasicParsing -Uri "https://raw.githubusercontent.com/tfenster/BC-Swarm/master/Swarm/template_traefik.toml" -OutFile c:\traefik\template_traefik.toml | Out-Null
 
 $template = Get-Content 'c:\traefik\template_traefik.toml' -Raw
 $expanded = Invoke-Expression "@`"`r`n$template`r`n`"@"
