@@ -11,7 +11,6 @@ param(
 # Traefik setup
 $traefikImg = "stefanscherer/traefik-windows:v1.7.12"
 New-Item -Path c:\traefik -ItemType Directory | Out-Null
-New-Item -Path c:\traefik\my -ItemType Directory | Out-Null
 New-Item -Path c:\traefik\config -ItemType Directory | Out-Null
 New-Item -Path c:\traefik\config\acme.json | Out-Null
 Invoke-WebRequest -UseBasicParsing -Uri "https://raw.githubusercontent.com/tfenster/BC-Swarm/master/template_traefik.toml" -OutFile c:\traefik\template_traefik.toml | Out-Null
@@ -25,6 +24,8 @@ Invoke-Expression "docker pull $traefikImg" | Out-Null
 # Swarm setup
 New-NetFirewallRule -DisplayName "Allow Swarm TCP" -Direction Inbound -Action Allow -Protocol TCP -LocalPort 2377,7946 | Out-Null
 New-NetFirewallRule -DisplayName "Allow Swarm UDP" -Direction Inbound -Action Allow -Protocol UDP -LocalPort 4789,7946 | Out-Null
+
+Out-File -FilePath c:\traefik\externaldns.txt -InputObject $externaldns
 
 $ipaddress = (Get-NetIPAddress | Where-Object { $_.IPAddress.StartsWith("10.0.3") }).IPAddress
 $result = Invoke-Expression "docker swarm init --advertise-addr $ipaddress"
