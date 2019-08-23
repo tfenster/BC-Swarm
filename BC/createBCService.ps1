@@ -33,6 +33,8 @@ docker service create `
 --name $name --health-start-period 300s --network $network --hostname $hostname `
 -e accept_eula=y -e accept_outdated=y -e usessl=n -e webserverinstance=$name -e publicdnsname=$publicDnsName -e $customNavSettings `
 -e "folders=c:\run\my=https://github.com/tfenster/BC-Swarm/archive/master.zip\BC-Swarm-master" `
+-e "databaseserver=bc-sql.database.windows.net" -e "databasename=testdb123" -e "databaseinstance=" `
+-e "databaseusername=SQL-Administrator" -e "databasepassword=Password*123" `
 --label "traefik.web.frontend.rule=$webclientRule" --label "traefik.web.port=80" `
 --label "traefik.soap.frontend.rule=$soapRule" --label "traefik.soap.port=7047" `
 --label "traefik.rest.frontend.rule=$restRule" --label "traefik.rest.port=7048" `

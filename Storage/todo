@@ -1,0 +1,14 @@
+Storage Account -> template
+Container -> New-AzureStorageContainer -Name "ContainerName" -Permission Off
+
+
+
+
+
+
+Prep DB
+CleanupUsers.sql
+CleanupViewProceduresFunctions.sql
+ExportDatabase.bat
+SAS Toklen und damit UploadBacpac.ps1
+key und damit ImportBacpac

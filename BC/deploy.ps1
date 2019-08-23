@@ -44,38 +44,18 @@ param(
  [Parameter(Mandatory=$True)]
  [securestring]
  $adminPassword,
-
- [Parameter(Mandatory=$True)]
- [string]
- $email,
-
+ 
  [Parameter(Mandatory=$True)]
  [int]
- $numberOfNodes,
+ $vCores,
+ 
+ [Parameter(Mandatory=$True)]
+ [int]
+ $sizeInGb,
 
  [Parameter(Mandatory=$False)]
  [string]
- $images = "",
-
- [Parameter(Mandatory=$False)]
- [string]
- $managerVmName = "mgr",
-
- [Parameter(Mandatory=$False)]
- [string]
- $managerVmSize = "Standard_D2s_v3",
-
- [Parameter(Mandatory=$False)]
- [string]
- $nodeVmName = "node",
-
- [Parameter(Mandatory=$False)]
- [string]
- $nodeVmSize = "Standard_D4s_v3",
-
- [Parameter(Mandatory=$False)]
- [string]
- $adminUser = "VM-Administrator"
+ $adminUser = "SQL-Administrator"
 
 )
 
@@ -169,4 +149,5 @@ else{
 
 # Start the deployment
 Write-Host "Starting deployment...";
-New-AzureRmResourceGroupDeployment -ResourceGroupName $resourceGroupName -Name "$name-swarmdeployment" -TemplateFile .\template.json -TemplateParameterFile .\parameters.json -location $location -adminPassword $adminPassword -adminUsername $adminUser -virtualNetworkName "${resourceGroupName}-vnet" -dnsLabelPrefix "$name-swarm" -email $email -count $numberOfNodes -images $images -virtualMachineNameMgr "$managerVmName" -publicIpAddressNameMgr "${managerVmName}-ip" -networkInterfaceNameMgr "${managerVmName}-ni" -networkSecurityGroupNameMgr "${managerVmName}-nsg" -virtualMachineSizeMgr $managerVmSize -virtualMachineNameNode "$nodeVmName" -publicIpAddressNameNode "${nodeVmName}-ip" -networkInterfaceNameNode "${nodeVmName}-ni" -networkSecurityGroupNameNode "${nodeVmName}-nsg" -virtualMachineSizeNode $nodeVmSize 
+$size = $sizeInGb * 1024 * 1024 * 1024
+New-AzureRmResourceGroupDeployment -ResourceGroupName $resourceGroupName -Name "$name-sqldeployment" -TemplateFile .\template.json -TemplateParameterFile .\parameters.json -serverLocation $location -administratorLoginPassword $adminPassword -administratorLogin $adminUser -serverName "${name}-sql" -elasticPoolName "${name}-pool" -poolLimit $vCores -perDatabasePerformanceMax $vCores -poolSize "$size"

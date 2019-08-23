@@ -7,6 +7,9 @@ $ServerName = "bc-sql"
 $PoolName = "bc-pool"
 $OriginalDatabaseName = "update"
 
+Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force
+Install-Module -Name Az -AllowClobber -Force
+
 $psCred = New-Object System.Management.Automation.PSCredential($ApplicationId , (ConvertTo-SecureString -String $Secret -Key $Key))
 
 Write-Host "Azure login"

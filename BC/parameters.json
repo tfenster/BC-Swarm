@@ -1,0 +1,18 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "skuName": {
+            "value": "GP_Gen5"
+        },
+        "tier": {
+            "value": "GeneralPurpose"
+        },
+        "perDatabasePerformanceMin": {
+            "value": "0"
+        },
+        "licenseType": {
+            "value": "LicenseIncluded"
+        }
+    }
+}
