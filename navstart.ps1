@@ -18,7 +18,7 @@ Write-Host "Azure login"
 Connect-AzAccount -Credential $psCred -TenantId $TenantId -ServicePrincipal
 
 Write-Host "Create database copy"
-New-AzSqlDatabaseCopy -ResourceGroupName $ResourceGroup -ServerName $ServerName -DatabaseName $OriginalDatabaseName -CopyResourceGroupName $ResourceGroup -CopyServerName $ServerName -CopyDatabaseName $DatabaseName -ElasticPoolName $PoolName
+New-AzSqlDatabaseCopy -ResourceGroupName $ResourceGroup -ServerName $ServerName -DatabaseName $OriginalDatabaseName -CopyResourceGroupName $ResourceGroup -CopyServerName $ServerName -CopyDatabaseName $DatabaseName -ElasticPoolName $PoolName -Verbose
 
 # invoke default
 . (Join-Path $runPath $MyInvocation.MyCommand.Name)
