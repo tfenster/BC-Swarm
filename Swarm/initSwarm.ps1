@@ -19,8 +19,6 @@ $template = Get-Content 'c:\traefik\template_traefik.toml' -Raw
 $expanded = Invoke-Expression "@`"`r`n$template`r`n`"@"
 $expanded | Out-File "c:\traefik\config\traefik.toml" -Encoding ASCII
 
-Invoke-Expression "docker pull $traefikImg" | Out-Null
-
 # Swarm setup
 New-NetFirewallRule -DisplayName "Allow Swarm TCP" -Direction Inbound -Action Allow -Protocol TCP -LocalPort 2377,7946 | Out-Null
 New-NetFirewallRule -DisplayName "Allow Swarm UDP" -Direction Inbound -Action Allow -Protocol UDP -LocalPort 4789,7946 | Out-Null
@@ -33,7 +31,7 @@ $result = Invoke-Expression "docker swarm init --advertise-addr $ipaddress"
 if ([string]::Concat($result) -match "docker swarm join --token (?<Token>.+) ${ipaddress}:2377") {
     Write-Host ("docker swarm join --token " + $matches.Token + " ${ipaddress}:2377")
     Invoke-Expression "docker network create --driver=overlay traefik-public" | Out-Null
-    Invoke-Expression "docker service create --name traefik --publish 80:80 --publish 443:443 --publish 8080:8080 --mount type=bind,source=c:/traefik/config,target=c:/etc/traefik --mount type=npipe,source=\\.\pipe\docker_engine,target=\\.\pipe\docker_engine --network traefik-public --label ""traefik.enable=true"" --label ""traefik.port=8080"" --constraint ""node.role==manager"" $traefikImg" | Out-Null
+    Invoke-Expression "docker stack deploy -c docker-compose.yml base" | Out-Null
 } else {
     Write-Host "Swarm init has failed: $result"
 }
