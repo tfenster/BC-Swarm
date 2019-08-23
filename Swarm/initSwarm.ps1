@@ -31,7 +31,8 @@ $result = Invoke-Expression "docker swarm init --advertise-addr $ipaddress"
 if ([string]::Concat($result) -match "docker swarm join --token (?<Token>.+) ${ipaddress}:2377") {
     Write-Host ("docker swarm join --token " + $matches.Token + " ${ipaddress}:2377")
     Invoke-Expression "docker network create --driver=overlay traefik-public" | Out-Null
-    Invoke-Expression "docker stack deploy -c docker-compose.yml base" | Out-Null
+    Invoke-WebRequest -UseBasicParsing -Uri "https://raw.githubusercontent.com/tfenster/BC-Swarm/master/Swarm/docker-compose.yml" -OutFile c:\traefik\docker-compose.yml | Out-Null
+    Invoke-Expression "docker stack deploy -c c:\traefik\docker-compose.yml base" | Out-Null
 } else {
     Write-Host "Swarm init has failed: $result"
 }
