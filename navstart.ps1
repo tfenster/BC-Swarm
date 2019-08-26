@@ -4,11 +4,12 @@ function Get-SecretOrConfigValue {
         [string]
         $Name
     )
-    if (Test-Path "c:\ProgramData\Docker\Secrets\$Name") {  
-        $value = Get-Content -Raw "c:\$Name"
+    $secretPath = "c:\ProgramData\Docker\Secrets\$Name"
+    if (Test-Path $secretPath) {  
+        $value = Get-Content -Raw $secretPath
         return $value
     } else {
-        Write-Error "Can't find config or secret $Name"
+        Write-Error "Can't find config or secret $secretPath"
         return "UNDEFINED"
     }
 }
