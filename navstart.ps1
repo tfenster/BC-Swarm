@@ -28,6 +28,7 @@ $KeyStringArray = $KeyAsString.Split(",")
 
 $DatabaseName = "$env:DatabaseName"
 
+Write-Host "Import Azure modules"
 Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force | Out-Null
 Install-Module -Name Az -AllowClobber -Force
 
@@ -36,8 +37,13 @@ $psCred = New-Object System.Management.Automation.PSCredential($ApplicationId , 
 Write-Host "Azure login"
 Connect-AzAccount -Credential $psCred -TenantId $TenantId -ServicePrincipal
 
-Write-Host "Create database copy"
-New-AzSqlDatabaseCopy -ResourceGroupName $ResourceGroup -ServerName $ServerName -DatabaseName $OriginalDatabaseName -CopyResourceGroupName $ResourceGroup -CopyServerName $ServerName -CopyDatabaseName $DatabaseName -ElasticPoolName $PoolName -Verbose
+$database = Get-AzSqlDatabase -ResourceGroupName $ResourceGroup -ServerName $ServerName -DatabaseName $DatabaseName
+if ($null -eq $database) {
+    Write-Host "Create database copy"
+    New-AzSqlDatabaseCopy -ResourceGroupName $ResourceGroup -ServerName $ServerName -DatabaseName $OriginalDatabaseName -CopyResourceGroupName $ResourceGroup -CopyServerName $ServerName -CopyDatabaseName $DatabaseName -ElasticPoolName $PoolName -Verbose
+} else {
+    Write-Host "Database already exists"
+}
 
 # invoke default
 . (Join-Path $runPath $MyInvocation.MyCommand.Name)
