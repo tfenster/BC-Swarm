@@ -37,8 +37,8 @@ $psCred = New-Object System.Management.Automation.PSCredential($ApplicationId , 
 Write-Host "Azure login"
 Connect-AzAccount -Credential $psCred -TenantId $TenantId -ServicePrincipal
 
-$database = Get-AzSqlDatabase -ResourceGroupName $ResourceGroup -ServerName $ServerName -DatabaseName $DatabaseName
-if ($null -eq $database) {
+Get-AzSqlDatabase -ResourceGroupName $ResourceGroup -ServerName $ServerName -DatabaseName $DatabaseName -ErrorAction Continue -errorVariable notThere 2>&1
+if ($notThere) {
     Write-Host "Create database copy"
     $stopwatch =  [system.diagnostics.stopwatch]::StartNew()
     New-AzSqlDatabaseCopy -ResourceGroupName $ResourceGroup -ServerName $ServerName -DatabaseName $OriginalDatabaseName -CopyResourceGroupName $ResourceGroup -CopyServerName $ServerName -CopyDatabaseName $DatabaseName -ElasticPoolName $PoolName
