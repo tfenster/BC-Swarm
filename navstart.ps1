@@ -43,7 +43,7 @@ if ($notThere) {
     $stopwatch =  [system.diagnostics.stopwatch]::StartNew()
     New-AzSqlDatabaseCopy -ResourceGroupName $ResourceGroup -ServerName $ServerName -DatabaseName $OriginalDatabaseName -CopyResourceGroupName $ResourceGroup -CopyServerName $ServerName -CopyDatabaseName $DatabaseName -ElasticPoolName $PoolName
     $stopwatch.Stop()
-    Write-Host "Creating the copy took ${stopwatch.Elapsed.TotalMinutes} minutes"
+    Write-Host ("Creating the copy took {0} minutes" -f $stopwatch.Elapsed.Minutes)
 } else {
     Write-Host "Database already exists"
 }
