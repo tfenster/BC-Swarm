@@ -1,11 +1,29 @@
-$ApplicationId = "72f0f77c-ddf5-4e14-909c-0ee129f6c5db"
-$Key = (3,4,2,3,56,34,254,222,1,1,2,23,42,54,33,233,1,34,2,7,6,5,35,43)
-$TenantId = "539f23a3-6819-457e-bd87-7835f4122217"
-$Secret = "76492d1116743f0423413b16050a5345MgB8AGIAcQBXAFMATgBOADQAZwA0ADQAcgBKAFIARgBPADYAMABXAFYARABiAFEAPQA9AHwANwBjAGUANQA1ADMAZAA4AGQAZAA5AGIANgBkADIAYQAwADcAMgAxADAAOQAyADQAZAAwADIANwAyADkAMQBiAGEAMgAwADUAMABjAGUAZQAwAGUAYwAwADcAZABkADQAYgA5AGIAMgA5ADUAYwBhADYAOQAwADMANQA4ADAAOQAzAGIANAA1ADYAZAAyADcAMwA2AGEAOQAwAGMANgAyAGMAMQBkAGEAYQAxAGYANgBiADMAOAA5AGQAYQAyAGEAMgBhADIAMgBmADAANgA5AGEAZgA5ADgAOAA5ADcANwAzAGYAOQAzADEAZAA0AGIAYQBkADcAYwBiAGIAMwBlADgAYwBjADcAYwAzADMANgAwADcANgBiAGYAMgBkAGIAMwBjADgAOQAyADUAYwA0AGQAZAAwADQAMABjADYAZAA="
-$ResourceGroup = "swarm2"
-$ServerName = "bc-sql"
-$PoolName = "bc-pool"
-$OriginalDatabaseName = "update"
+function Get-SecretOrConfigValue {
+    param(
+        [Parameter(Mandatory=$True)]
+        [string]
+        $Name
+    )
+    if (Test-Path "c:\$Name") {  
+        $value = Get-Content -Raw "c:\$Name"
+        return $value
+    } else {
+        Write-Error "Can't find config or secret $Name"
+        return "UNDEFINED"
+    }
+}
+
+$ApplicationId = Get-SecretOrConfigValue -Name "bc_swarm_applicationId"
+$KeyAsString = Get-SecretOrConfigValue -Name "bc_swarm_accountSecretkey"
+$TenantId = Get-SecretOrConfigValue -Name "bc_swarm_tenantId"
+$Secret = Get-SecretOrConfigValue -Name "bc_swarm_accountSecret"
+$ResourceGroup = Get-SecretOrConfigValue -Name "bc_swarm_resourceGroup"
+$ServerName = Get-SecretOrConfigValue -Name "bc_swarm_serverName"
+$PoolName = Get-SecretOrConfigValue -Name "bc_swarm_poolName"
+$OriginalDatabaseName = Get-SecretOrConfigValue -Name "bc_swarm_originalDatabaseName"
+
+$KeyStringArray = $KeyAsString.Split(",")
+[array]$Key = foreach($number in $KeyStringArray) {([int]::parse($number))}
 
 $DatabaseName = "$env:DatabaseName"
 
