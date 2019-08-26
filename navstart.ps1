@@ -4,7 +4,7 @@ function Get-SecretOrConfigValue {
         [string]
         $Name
     )
-    $secretPath = "c:\ProgramData\Docker\Secrets\$Name"
+    $secretPath = "c:\ConfigsAndSecrets\$Name"
     if (Test-Path $secretPath) {  
         $value = Get-Content -Raw $secretPath
         return $value
