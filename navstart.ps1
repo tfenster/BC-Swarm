@@ -14,6 +14,8 @@ function Get-SecretOrConfigValue {
     }
 }
 
+$overallStopwatch =  [system.diagnostics.stopwatch]::StartNew()
+
 $ApplicationId = Get-SecretOrConfigValue -Name "bc_swarm_applicationId"
 $KeyAsString = Get-SecretOrConfigValue -Name "bc_swarm_accountSecretkey"
 $TenantId = Get-SecretOrConfigValue -Name "bc_swarm_tenantId"
@@ -47,6 +49,9 @@ if ($notThere) {
 } else {
     Write-Host "Database already exists"
 }
+
+$overallStopwatch.Stop()
+Write-Host ("The Azure stuff took {0} minutes" -f $overallStopwatch.Elapsed.Minutes)
 
 # invoke default
 . (Join-Path $runPath $MyInvocation.MyCommand.Name)
