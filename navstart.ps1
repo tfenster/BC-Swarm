@@ -40,7 +40,10 @@ Connect-AzAccount -Credential $psCred -TenantId $TenantId -ServicePrincipal
 $database = Get-AzSqlDatabase -ResourceGroupName $ResourceGroup -ServerName $ServerName -DatabaseName $DatabaseName
 if ($null -eq $database) {
     Write-Host "Create database copy"
-    New-AzSqlDatabaseCopy -ResourceGroupName $ResourceGroup -ServerName $ServerName -DatabaseName $OriginalDatabaseName -CopyResourceGroupName $ResourceGroup -CopyServerName $ServerName -CopyDatabaseName $DatabaseName -ElasticPoolName $PoolName -Verbose
+    $stopwatch =  [system.diagnostics.stopwatch]::StartNew()
+    New-AzSqlDatabaseCopy -ResourceGroupName $ResourceGroup -ServerName $ServerName -DatabaseName $OriginalDatabaseName -CopyResourceGroupName $ResourceGroup -CopyServerName $ServerName -CopyDatabaseName $DatabaseName -ElasticPoolName $PoolName
+    $stopwatch.Stop()
+    Write-Host "Creating the copy took ${stopwatch.Elapsed.TotalMinutes} minutes"
 } else {
     Write-Host "Database already exists"
 }
