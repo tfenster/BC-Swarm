@@ -46,7 +46,7 @@ $restUrl = $baseUrl + $restPart
 $soapUrl = $baseUrl + $soapPart
 $webclientUrl = $baseUrl + $webclientPart
 
-$customNavSettings = "customnavsettings=PublicODataBaseUrl=$restUrl,PublicSOAPBaseUrl=$soapUrl,PublicWebBaseUrl=$webclientUrl"
+$customNavSettings = "customnavsettings=PublicODataBaseUrl=$restUrl,PublicSOAPBaseUrl=$soapUrl,PublicWebBaseUrl=$webclientUrl,EnableSymbolLoadingAtServerStartup=true"
 $webclientRule="PathPrefix:$webclientPart"
 $soapRule="PathPrefix:${soapPart};ReplacePathRegex: ^${soapPart}(.*) /NAV/WS/`$1"
 $restRule="PathPrefix:${restPart};ReplacePathRegex: ^${restPart}(.*) /NAV/OData/`$1"
