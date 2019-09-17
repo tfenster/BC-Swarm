@@ -33,7 +33,7 @@ param(
 )
 
 $publicDnsName = Get-Content -Path "c:\traefik\externaldns.txt"
-if ($null -eq $navUserName) {
+if ([string]::IsNullOrEmpty($navUserName)) {
     $navUserName = $name
 }
 
