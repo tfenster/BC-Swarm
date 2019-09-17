@@ -7,7 +7,7 @@ Stop-Process -Name Explorer
 Write-Host "IE Enhanced Security Configuration (ESC) has been disabled." -ForegroundColor Green
 
 mkdir c:\scripts | out-null
-cd C:\scripts
+Set-Location C:\scripts
 Invoke-WebRequest -UseBasicParsing -Uri "https://raw.githubusercontent.com/tfenster/BC-Swarm/master/BC/createConfigsAndSecrets.ps1" -OutFile C:\scripts\createConfigsAndSecrets.ps1
 Invoke-WebRequest -UseBasicParsing -Uri "https://raw.githubusercontent.com/tfenster/BC-Swarm/master/BC/createBCService.ps1" -OutFile C:\scripts\createBCService.ps1
 Write-Host "Script folder prepared and downloaded all scripts" -ForegroundColor Green
