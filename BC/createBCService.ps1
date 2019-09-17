@@ -15,7 +15,7 @@ param(
  [string]
  $databaseUserName,
  
- [Parameter(Mandatory=$True)]
+ [Parameter(Mandatory=$False)]
  [string]
  $navUserName,
  
@@ -33,6 +33,9 @@ param(
 )
 
 $publicDnsName = Get-Content -Path "c:\traefik\externaldns.txt"
+if ($null -eq $navUserName) {
+    $navUserName = $name
+}
 
 $network = "traefik-public"
 $hostname = $publicDnsName.Substring(0, $publicDnsName.IndexOf("."))
