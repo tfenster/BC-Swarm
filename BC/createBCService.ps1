@@ -11,9 +11,9 @@ param(
  [string]
  $databaseServer,
  
- [Parameter(Mandatory=$True)]
+ [Parameter(Mandatory=$False)]
  [string]
- $databaseUserName,
+ $databaseUserName = "SQL-Administrator",
  
  [Parameter(Mandatory=$False)]
  [string]
