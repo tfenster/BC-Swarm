@@ -51,7 +51,7 @@ param(
 
  [Parameter(Mandatory=$True)]
  [int]
- $numberOfNodes,
+ $numberOfWorkers,
 
  [Parameter(Mandatory=$False)]
  [string]
@@ -67,11 +67,11 @@ param(
 
  [Parameter(Mandatory=$False)]
  [string]
- $nodeVmName = "node",
+ $workerVmName = "worker",
 
  [Parameter(Mandatory=$False)]
  [string]
- $nodeVmSize = "Standard_D4s_v3",
+ $workerVmSize = "Standard_D4s_v3",
 
  [Parameter(Mandatory=$False)]
  [string]
@@ -169,4 +169,4 @@ else{
 
 # Start the deployment
 Write-Host "Starting deployment...";
-New-AzureRmResourceGroupDeployment -ResourceGroupName $resourceGroupName -Name "$name-swarmdeployment" -TemplateFile .\template.json -TemplateParameterFile .\parameters.json -location $location -adminPassword $adminPassword -adminUsername $adminUser -virtualNetworkName "${resourceGroupName}-vnet" -dnsLabelPrefix "$name-swarm" -email $email -count $numberOfNodes -images $images -virtualMachineNameMgr "$managerVmName" -publicIpAddressNameMgr "${managerVmName}-ip" -networkInterfaceNameMgr "${managerVmName}-ni" -networkSecurityGroupNameMgr "${managerVmName}-nsg" -virtualMachineSizeMgr $managerVmSize -virtualMachineNameNode "$nodeVmName" -publicIpAddressNameNode "${nodeVmName}-ip" -networkInterfaceNameNode "${nodeVmName}-ni" -networkSecurityGroupNameNode "${nodeVmName}-nsg" -virtualMachineSizeNode $nodeVmSize 
+New-AzureRmResourceGroupDeployment -ResourceGroupName $resourceGroupName -Name "$name-swarmdeployment" -TemplateFile .\template.json -TemplateParameterFile .\parameters.json -location $location -adminPassword $adminPassword -adminUsername $adminUser -virtualNetworkName "${resourceGroupName}-vnet" -dnsLabelPrefix "$name-swarm" -email $email -count $numberOfWorkers -images $images -virtualMachineNameMgr "$managerVmName" -publicIpAddressNameMgr "${managerVmName}-ip" -networkInterfaceNameMgr "${managerVmName}-ni" -networkSecurityGroupNameMgr "${managerVmName}-nsg" -virtualMachineSizeMgr $managerVmSize -virtualMachineNameWorker "$workerVmName" -publicIpAddressNameWorker "${workerVmName}-ip" -networkInterfaceNameWorker "${workerVmName}-ni" -networkSecurityGroupNameWorker "${workerVmName}-nsg" -virtualMachineSizeWorker $workerVmName 
