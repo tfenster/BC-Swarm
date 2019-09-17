@@ -83,5 +83,5 @@ docker service create `
 --config "src=bc_swarm_poolName,target=c:\ConfigsAndSecrets\bc_swarm_poolName" `
 --config "src=bc_swarm_originalDatabaseName,target=c:\ConfigsAndSecrets\bc_swarm_originalDatabaseName" `
 --constraint "node.role!=manager" `
--m 12G `
+--limit-memory 12G `
 $image
