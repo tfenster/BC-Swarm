@@ -27,7 +27,7 @@
 param(
  [Parameter(Mandatory=$True)]
  [string]
- $subscriptionName,
+ $subscriptionId,
 
  [Parameter(Mandatory=$True)]
  [string]
@@ -141,18 +141,17 @@ $ErrorActionPreference = "Stop"
 
 # sign in
 Write-Host "Logging in...";
-#Login-AzureRmAccount;
+Login-AzureRmAccount;
 
 # select subscription
-Write-Host "Selecting subscription '$subscriptionName'";
-Select-AzureRmSubscription -SubscriptionID (Get-AzureRmSubscription -SubscriptionName $subscriptionName).SubscriptionId;
+Select-AzureRmSubscription -SubscriptionID $subscriptionId;
 
 # Register RPs
 $resourceProviders = @("microsoft.network","microsoft.compute","microsoft.devtestlab","microsoft.resources");
 if($resourceProviders.length) {
     Write-Host "Registering resource providers"
     foreach($resourceProvider in $resourceProviders) {
-        #RegisterRP($resourceProvider);
+        RegisterRP($resourceProvider);
     }
 }
 
