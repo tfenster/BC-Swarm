@@ -11,4 +11,27 @@ CleanupUsers.sql
 CleanupViewProceduresFunctions.sql
 ExportDatabase.bat
 SAS Toklen und damit UploadBacpac.ps1
+add client access to sql server
 key und damit ImportBacpac
+
+
+
+
+
+Durchlauf 
+Voraussetzung ist eine Subscription (afbfb5e1-6f11-4f0d-86f7-83641110b2gg) und Resource Group (fk-<location>) mit folgenden Resources:
+- Azure SQL server (fk-sql-<location> / bc-sql-tfe.database.windows.net)
+- DB als Startpunkt (Fachkonferenz-AL)
+- Azure SQL Pool (bc-pool)
+- Download-URL für .zip der DLLs (addInsUrl)
+
+clone https://github.com/tfenster/BC-Swarm
+
+Swarm erstellen:
+.\deploy.ps1 -subscriptionId afbfb5e1-6f11-4f0d-86f7-83641110b2gg -resourceGroupName fk-westeurope -location westeurope -name fk -adminPassword (ConvertTo-SecureString -String "Passw0rd*123" -AsPlainText -Force) -email tobias.fenster@axians-infoma.de -numberOfWorkers 7 -images "mcr.microsoft.com/businesscentral/onprem:1904-cu1-de-ltsc2019" -Initial
+.\deploy.ps1 -subscriptionId afbfb5e1-6f11-4f0d-86f7-83641110b2gg -resourceGroupName fk-northeurope -location northeurope -name fk -adminPassword (ConvertTo-SecureString -String "Passw0rd*123" -AsPlainText -Force) -email tobias.fenster@axians-infoma.de -numberOfWorkers 7 -images "mcr.microsoft.com/businesscentral/onprem:1904-cu1-de-ltsc2019"
+
+BC Services erstellen:
+Invoke-WebRequest -UseBasicParsing -Uri "https://raw.githubusercontent.com/tfenster/BC-Swarm/master/BC/setupScripts.ps1" -OutFile setupScripts.ps1 ; .\setupScripts.ps1
+.\createConfigsAndSecrets.ps1 -subscriptionId afbfb5e1-6f11-4f0d-86f7-83641110b2gg -resourceGroup fk-northeurope -sqlServerName fk-sql-northeurope -poolName bc-pool -originalDatabaseName Fachkonferenz-AL
+.\createBCService.ps1 -image mcr.microsoft.com/businesscentral/onprem:1904-cu1-de-ltsc2019 -databaseServer fk-sql-northeurope.database.windows.net -addInsUrl 'https://storage3dvcnkygpkngo.blob.core.windows.net/share/Kumulativ.zip?sp=r&st=2019-09-17T08:14:33Z&se=2019-10-01T16:14:33Z&spr=https&sv=2018-03-28&sig=Ta%2BGMMIQxbPO579ablkZL31zAf2zQgO%2Bj4mEaMfYlXY%3D&sr=b' -name KARO -navPassword ssrg8309

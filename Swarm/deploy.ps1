@@ -71,11 +71,15 @@ param(
 
  [Parameter(Mandatory=$False)]
  [string]
- $workerVmSize = "Standard_D4s_v3",
+ $workerVmSize = "Standard_D8s_v3",
 
  [Parameter(Mandatory=$False)]
  [string]
- $adminUser = "VM-Administrator"
+ $adminUser = "VM-Administrator",
+
+ [Parameter(Mandatory=$False)]
+ [switch]
+ $initial = $False
 
 )
 
@@ -139,19 +143,21 @@ Function ConvertPSObjectToHashtable
 #******************************************************************************
 $ErrorActionPreference = "Stop"
 
-# sign in
-Write-Host "Logging in...";
-Login-AzureRmAccount;
+if ($initial) {
+    # sign in
+    Write-Host "Logging in...";
+    Login-AzureRmAccount;
 
-# select subscription
-Select-AzureRmSubscription -SubscriptionID $subscriptionId;
+    # select subscription
+    Select-AzureRmSubscription -SubscriptionID $subscriptionId;
 
-# Register RPs
-$resourceProviders = @("microsoft.network","microsoft.compute","microsoft.devtestlab","microsoft.resources");
-if($resourceProviders.length) {
-    Write-Host "Registering resource providers"
-    foreach($resourceProvider in $resourceProviders) {
-        RegisterRP($resourceProvider);
+    # Register RPs
+    $resourceProviders = @("microsoft.network","microsoft.compute","microsoft.devtestlab","microsoft.resources");
+    if($resourceProviders.length) {
+        Write-Host "Registering resource providers"
+        foreach($resourceProvider in $resourceProviders) {
+            RegisterRP($resourceProvider);
+        }
     }
 }
 
