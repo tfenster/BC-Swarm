@@ -29,7 +29,7 @@ services:
     volumes:
       - portainer-data:c:/data
     networks:
-      - agent-network
+#      - agent-network
       - public
     deploy:
       placement:
