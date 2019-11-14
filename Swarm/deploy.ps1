@@ -93,7 +93,7 @@ Function RegisterRP {
     )
 
     Write-Host "Registering resource provider '$ResourceProviderNamespace'";
-    Register-AzureRmResourceProvider -ProviderNamespace $ResourceProviderNamespace;
+    Register-AzResourceProvider -ProviderNamespace $ResourceProviderNamespace;
 }
 
 # copied from https://stackoverflow.com/a/34383413 with a minimal change
@@ -146,10 +146,10 @@ $ErrorActionPreference = "Stop"
 if ($initial) {
     # sign in
     Write-Host "Logging in...";
-    Login-AzureRmAccount;
+    Login-AzAccount
 
     # select subscription
-    Select-AzureRmSubscription -SubscriptionID $subscriptionId;
+    Select-AzSubscription -SubscriptionID $subscriptionId;
 
     # Register RPs
     $resourceProviders = @("microsoft.network","microsoft.compute","microsoft.devtestlab","microsoft.resources");
@@ -162,11 +162,11 @@ if ($initial) {
 }
 
 #Create or check for existing resource group
-$resourceGroup = Get-AzureRmResourceGroup -Name $resourceGroupName -ErrorAction SilentlyContinue
+$resourceGroup = Get-AzResourceGroup -Name $resourceGroupName -ErrorAction SilentlyContinue
 if(!$resourceGroup)
 {
     Write-Host "Resource group '$resourceGroupName' does not exist. Creating resource group '$resourceGroupName' in location '$location'";
-    New-AzureRmResourceGroup -Name $resourceGroupName -Location $location
+    New-AzResourceGroup -Name $resourceGroupName -Location $location
 }
 else{
     Write-Host "Using existing resource group '$resourceGroupName'";
@@ -174,4 +174,4 @@ else{
 
 # Start the deployment
 Write-Host "Starting deployment...";
-New-AzureRmResourceGroupDeployment -ResourceGroupName $resourceGroupName -Name "$name-swarmdeployment" -TemplateFile .\template.json -TemplateParameterFile .\parameters.json -location $location -adminPassword $adminPassword -adminUsername $adminUser -virtualNetworkName "${resourceGroupName}-vnet" -dnsLabelPrefix "$name-swarm" -email $email -count $numberOfWorkers -images $images -virtualMachineNameMgr "$managerVmName" -publicIpAddressNameMgr "${managerVmName}-ip" -networkInterfaceNameMgr "${managerVmName}-ni" -networkSecurityGroupNameMgr "${managerVmName}-nsg" -virtualMachineSizeMgr $managerVmSize -virtualMachineNameWorker "$workerVmName" -publicIpAddressNameWorker "${workerVmName}-ip" -networkInterfaceNameWorker "${workerVmName}-ni" -networkSecurityGroupNameWorker "${workerVmName}-nsg" -virtualMachineSizeWorker $workerVmSize
+New-AzResourceGroupDeployment -ResourceGroupName $resourceGroupName -Name "$name-swarmdeployment" -TemplateFile .\template.json -TemplateParameterFile .\parameters.json -location $location -adminPassword $adminPassword -adminUsername $adminUser -virtualNetworkName "${resourceGroupName}-vnet" -dnsLabelPrefix "$name-swarm" -email $email -count $numberOfWorkers -images $images -virtualMachineNameMgr "$managerVmName" -publicIpAddressNameMgr "${managerVmName}-ip" -networkInterfaceNameMgr "${managerVmName}-ni" -networkSecurityGroupNameMgr "${managerVmName}-nsg" -virtualMachineSizeMgr $managerVmSize -virtualMachineNameWorker "$workerVmName" -publicIpAddressNameWorker "${workerVmName}-ip" -networkInterfaceNameWorker "${workerVmName}-ni" -networkSecurityGroupNameWorker "${workerVmName}-nsg" -virtualMachineSizeWorker $workerVmSize
