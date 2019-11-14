@@ -1,0 +1,46 @@
+version: '3.3'
+
+services:
+
+  agent:
+    image: portainer/agent:windows1809-amd64
+    environment:
+      AGENT_CLUSTER_ADDR: tasks.agent
+    volumes:
+      - source: '\\.\pipe\docker_engine'
+        target: '\\.\pipe\docker_engine'
+        type: npipe
+      - source: 'C:/ProgramData/docker/volumes'
+        target: 'C:/ProgramData/docker/volumes'
+        type: bind
+    networks:
+      - agent-network
+    deploy:
+      mode: global
+      placement:
+        constraints:
+          - node.platform.os == windows
+
+  portainer:
+    image: portainer/portainer:windows1809-amd64
+    command: -H tcp://tasks.agent:9001 --tlsskipverify
+    ports:
+      - 9000:9000
+    volumes:
+      - portainer-data:c:/data
+    networks:
+      - agent-network
+      - traefik-public
+    deploy:
+      placement:
+        constraints:
+          - node.role == manager
+
+networks:
+  agent-network:
+    attachable: true
+  public:
+    external: true
+
+volumes:
+  portainer-data:
