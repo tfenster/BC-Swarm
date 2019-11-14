@@ -76,6 +76,9 @@
         },
         "count": {
             "type": "int"
+        },
+        "images": {
+            "type": "string"
         }
     },
     "variables": {
@@ -317,7 +320,7 @@
                 "autoUpgradeMinorVersion": true,
                 "settings": {
                     "fileUris": [
-                        "https://raw.githubusercontent.com/tfenster/BC-Swarm/master/Bare%20swarm/initSwarm.ps1"
+                        "https://raw.githubusercontent.com/tfenster/BC-Swarm/master/Swarm/initSwarm.ps1"
                     ]
                 },
                 "protectedSettings": {
@@ -341,11 +344,11 @@
                 "autoUpgradeMinorVersion": true,
                 "settings": {
                     "fileUris": [
-                        "https://raw.githubusercontent.com/tfenster/BC-Swarm/master/Bare%20swarm/joinSwarm.ps1"
+                        "https://raw.githubusercontent.com/tfenster/BC-Swarm/master/Swarm/joinSwarm.ps1"
                     ]
                 },
                 "protectedSettings": {
-                    "commandToExecute": "[concat('powershell -ExecutionPolicy Unrestricted -File joinSwarm.ps1 -joinCommand \"', reference(resourceId('Microsoft.Compute/virtualMachines/extensions', parameters('virtualMachineNameMgr'), 'script1')).instanceView.substatuses[0].message, '\"')]"
+                    "commandToExecute": "[concat('powershell -ExecutionPolicy Unrestricted -File joinSwarm.ps1 -images \"', parameters('images'), '\" -joinCommand \"', reference(resourceId('Microsoft.Compute/virtualMachines/extensions', parameters('virtualMachineNameMgr'), 'script1')).instanceView.substatuses[0].message, '\"')]"
                   }
             },
             "copy": {

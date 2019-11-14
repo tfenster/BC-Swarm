@@ -11,6 +11,7 @@ param(
 # Swarm setup
 New-NetFirewallRule -DisplayName "Allow Swarm TCP" -Direction Inbound -Action Allow -Protocol TCP -LocalPort 2377,7946 | Out-Null
 New-NetFirewallRule -DisplayName "Allow Swarm UDP" -Direction Inbound -Action Allow -Protocol UDP -LocalPort 4789,7946 | Out-Null
+New-NetFirewallRule -DisplayName "Allow hostname webapp" -Direction Inbound -Action Allow -Protocol TCP -LocalPort 8080 | Out-Null
 Write-Host "join swarm"
 Invoke-Expression $joinCommand
 
