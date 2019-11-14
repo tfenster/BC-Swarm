@@ -44,7 +44,7 @@
                     }
                 },
                 {
-                    "name": "RDP",
+                    "name": "webapp",
                     "properties": {
                         "priority": 350,
                         "protocol": "TCP",
