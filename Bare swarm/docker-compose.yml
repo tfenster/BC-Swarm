@@ -30,7 +30,7 @@ services:
       - portainer-data:c:/data
     networks:
       - agent-network
-      - traefik-public
+      - public
     deploy:
       placement:
         constraints:
