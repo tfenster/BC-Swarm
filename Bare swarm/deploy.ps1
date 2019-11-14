@@ -55,10 +55,6 @@ param(
 
  [Parameter(Mandatory=$False)]
  [string]
- $images = "",
-
- [Parameter(Mandatory=$False)]
- [string]
  $managerVmName = "mgr",
 
  [Parameter(Mandatory=$False)]
@@ -174,4 +170,4 @@ else{
 
 # Start the deployment
 Write-Host "Starting deployment...";
-New-AzResourceGroupDeployment -ResourceGroupName $resourceGroupName -Name "$name-swarmdeployment" -TemplateFile .\template.json -TemplateParameterFile .\parameters.json -location $location -adminPassword $adminPassword -adminUsername $adminUser -virtualNetworkName "${resourceGroupName}-vnet" -dnsLabelPrefix "$name-swarm" -email $email -count $numberOfWorkers -images $images -virtualMachineNameMgr "$managerVmName" -publicIpAddressNameMgr "${managerVmName}-ip" -networkInterfaceNameMgr "${managerVmName}-ni" -networkSecurityGroupNameMgr "${managerVmName}-nsg" -virtualMachineSizeMgr $managerVmSize -virtualMachineNameWorker "$workerVmName" -publicIpAddressNameWorker "${workerVmName}-ip" -networkInterfaceNameWorker "${workerVmName}-ni" -networkSecurityGroupNameWorker "${workerVmName}-nsg" -virtualMachineSizeWorker $workerVmSize
+New-AzResourceGroupDeployment -ResourceGroupName $resourceGroupName -Name "$name-swarmdeployment" -TemplateFile .\template.json -TemplateParameterFile .\parameters.json -location $location -adminPassword $adminPassword -adminUsername $adminUser -virtualNetworkName "${resourceGroupName}-vnet" -dnsLabelPrefix "$name-swarm" -email $email -count $numberOfWorkers -virtualMachineNameMgr "$managerVmName" -publicIpAddressNameMgr "${managerVmName}-ip" -networkInterfaceNameMgr "${managerVmName}-ni" -networkSecurityGroupNameMgr "${managerVmName}-nsg" -virtualMachineSizeMgr $managerVmSize -virtualMachineNameWorker "$workerVmName" -publicIpAddressNameWorker "${workerVmName}-ip" -networkInterfaceNameWorker "${workerVmName}-ni" -networkSecurityGroupNameWorker "${workerVmName}-nsg" -virtualMachineSizeWorker $workerVmSize
