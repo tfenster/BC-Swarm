@@ -73,7 +73,7 @@ Connect-AzAccount
 
 $account = New-AzADServicePrincipal -Scope "/subscriptions/$subscriptionId/resourceGroups/$resourceGroup/providers/Microsoft.Sql/servers/$sqlServerName"
 New-AzRoleAssignment -Scope "/subscriptions/$subscriptionId" -RoleDefinitionName "Reader" -ApplicationId $account.ApplicationId
-New-AzRoleAssignment -Scope "/subscriptions/$subscriptionId/resourceGroups/$originalResourceGroup/providers/Microsoft.Sql/servers/$originalsqlServerName" -RoleDefinitionName "Reader" -ApplicationId $account.ApplicationId
+New-AzRoleAssignment -Scope "/subscriptions/$subscriptionId/resourceGroups/$originalResourceGroup/providers/Microsoft.Sql/servers/$originalsqlServerName" -RoleDefinitionName "Contributor" -ApplicationId $account.ApplicationId
 $applicationId = $account.ApplicationId
 
 $Key = @()
