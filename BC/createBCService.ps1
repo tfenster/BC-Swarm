@@ -9,33 +9,26 @@ param(
  
  [Parameter(Mandatory=$True)]
  [string]
- $databaseServer,
- 
- [Parameter(Mandatory=$False)]
- [string]
- $databaseUserName = "SQL-Administrator",
- 
- [Parameter(Mandatory=$False)]
- [string]
- $navUserName,
+ $databaseUserName,
  
  [Parameter(Mandatory=$False)]
  [string]
  $addInsUrl,
 
- [Parameter(Mandatory=$False)]
+ [Parameter(Mandatory=$True)]
  [string]
- $databasePassword = "Passw0rd*123",
+ $databasePassword,
  
- [Parameter(Mandatory=$False)]
+ [Parameter(Mandatory=$True)]
  [string]
- $navPassword = "Start123$"
+ $navPassword,
+ 
+ [Parameter(Mandatory=$True)]
+ [string]
+ $originalDatabaseName
 )
 
 $publicDnsName = Get-Content -Path "c:\traefik\externaldns.txt"
-if ([string]::IsNullOrEmpty($navUserName)) {
-    $navUserName = $name
-}
 
 $network = "traefik-public"
 $hostname = $publicDnsName.Substring(0, $publicDnsName.IndexOf("."))
@@ -58,16 +51,16 @@ $dlRule="PathPrefixStrip:${dlPart}"
 
 $folders = "folders=c:\run\my=https://github.com/tfenster/BC-Swarm/archive/master.zip\BC-Swarm-master"
 if (-not [string]::IsNullOrEmpty($addInsUrl)) {
-    $folders += ",C:\Program Files\Microsoft Dynamics NAV\140\Service\Add-ins\Custom=$addInsUrl"
+    $folders += ",C:\run\Add-ins=$addInsUrl"
 }
 
 docker service create `
 --name $name --health-start-period 900s --health-timeout 900s --network $network --hostname $hostname `
 -e accept_eula=y -e accept_outdated=y -e usessl=n -e webserverinstance=$name -e publicdnsname=$publicDnsName -e $customNavSettings `
 -e "$folders" `
--e "databaseserver=$databaseServer.database.windows.net" -e "databasename=$name" -e "databaseinstance=" `
--e "databaseusername=$databaseUserName" -e "databasepassword=$databasePassword" `
--e "username=$navUserName" -e "password=$navPassword" `
+-e "databasename=$name" `
+-e "databaseusername=$databaseUserName" -e "databasepassword=$databasePassword" -e "OriginalDatabaseName=$originalDatabaseName" `
+-e "username=$name" -e "password=$navPassword" `
 --label "traefik.web.frontend.rule=$webclientRule" --label "traefik.web.port=80" `
 --label "traefik.soap.frontend.rule=$soapRule" --label "traefik.soap.port=7047" `
 --label "traefik.rest.frontend.rule=$restRule" --label "traefik.rest.port=7048" `
@@ -82,7 +75,8 @@ docker service create `
 --config "src=bc_swarm_resourceGroup,target=c:\ConfigsAndSecrets\bc_swarm_resourceGroup" `
 --config "src=bc_swarm_serverName,target=c:\ConfigsAndSecrets\bc_swarm_serverName" `
 --config "src=bc_swarm_poolName,target=c:\ConfigsAndSecrets\bc_swarm_poolName" `
---config "src=bc_swarm_originalDatabaseName,target=c:\ConfigsAndSecrets\bc_swarm_originalDatabaseName" `
+--config "src=bc_swarm_originalResourceGroup,target=c:\ConfigsAndSecrets\bc_swarm_originalResourceGroup" `
+--config "src=bc_swarm_originalServerName,target=c:\ConfigsAndSecrets\bc_swarm_originalServerName" `
 --constraint "node.role!=manager" `
 --limit-memory 12G `
 --detach `

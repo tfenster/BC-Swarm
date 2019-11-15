@@ -5,7 +5,15 @@ param(
  
  [Parameter(Mandatory=$True)]
  [string]
+ $originalResourceGroup,
+ 
+ [Parameter(Mandatory=$True)]
+ [string]
  $resourceGroup,
+ 
+ [Parameter(Mandatory=$True)]
+ [string]
+ $originalsqlServerName,
  
  [Parameter(Mandatory=$True)]
  [string]
@@ -65,6 +73,7 @@ Connect-AzAccount
 
 $account = New-AzADServicePrincipal -Scope "/subscriptions/$subscriptionId/resourceGroups/$resourceGroup/providers/Microsoft.Sql/servers/$sqlServerName"
 New-AzRoleAssignment -Scope "/subscriptions/$subscriptionId" -RoleDefinitionName "Reader" -ApplicationId $account.ApplicationId
+New-AzRoleAssignment -Scope "/subscriptions/$subscriptionId/resourceGroups/$originalResourceGroup/providers/Microsoft.Sql/servers/$originalsqlServerName" -RoleDefinitionName "Reader" -ApplicationId $account.ApplicationId
 $applicationId = $account.ApplicationId
 
 $Key = @()
@@ -86,4 +95,17 @@ Set-DockerConfig -configName bc_swarm_subscriptionId -configValue $subscriptionI
 Set-DockerConfig -configName bc_swarm_resourceGroup -configValue $resourceGroup
 Set-DockerConfig -configName bc_swarm_serverName -configValue $sqlServerName
 Set-DockerConfig -configName bc_swarm_poolName -configValue $poolName
-Set-DockerConfig -configName bc_swarm_originalDatabaseName -configValue $originalDatabaseName
+Set-DockerConfig -configName bc_swarm_originalResourceGroup -configValue $originalResourceGroup
+Set-DockerConfig -configName bc_swarm_originalServerName -configValue $originalSqlServerName
+
+docker secret rm bc_swarm_applicationId 
+docker secret rm bc_swarm_accountSecret 
+docker secret rm bc_swarm_accountSecretkey 
+
+docker config rm bc_swarm_tenantId
+docker config rm bc_swarm_subscriptionId
+docker config rm bc_swarm_resourceGroup
+docker config rm bc_swarm_serverName
+docker config rm bc_swarm_poolName
+docker config rm bc_swarm_originalResourceGroup
+docker config rm bc_swarm_originalServerName
