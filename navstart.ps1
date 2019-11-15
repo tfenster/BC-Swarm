@@ -23,10 +23,12 @@ $SubscriptionId = Get-SecretOrConfigValue -Name "bc_swarm_subscriptionId"
 $Secret = Get-SecretOrConfigValue -Name "bc_swarm_accountSecret"
 $ResourceGroup = Get-SecretOrConfigValue -Name "bc_swarm_resourceGroup"
 $ServerName = Get-SecretOrConfigValue -Name "bc_swarm_serverName"
-$env:DatabaseServer = $ServerName
 $PoolName = Get-SecretOrConfigValue -Name "bc_swarm_poolName"
 $OriginalResourceGroup = Get-SecretOrConfigValue -Name "bc_swarm_originalResourceGroup"
 $OriginalServerName = Get-SecretOrConfigValue -Name "bc_swarm_originalServerName"
+
+$env:DatabaseServer="$databaseServer.database.windows.net"
+$env:DatabaseInstance=""
 
 $KeyStringArray = $KeyAsString.Split(",")
 [array]$Key = foreach($number in $KeyStringArray) {([int]::parse($number))}
