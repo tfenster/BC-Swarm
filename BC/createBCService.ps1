@@ -44,9 +44,9 @@ $webclientUrl = $baseUrl + $webclientPart
 
 $customNavSettings = "customnavsettings=PublicODataBaseUrl=$restUrl,PublicSOAPBaseUrl=$soapUrl,PublicWebBaseUrl=$webclientUrl,EnableSymbolLoadingAtServerStartup=true"
 $webclientRule="PathPrefix:$webclientPart"
-$soapRule="PathPrefix:${soapPart};ReplacePathRegex: ^${soapPart}(.*) /NAV/WS/`$1"
-$restRule="PathPrefix:${restPart};ReplacePathRegex: ^${restPart}(.*) /NAV/OData/`$1"
-$devRule="PathPrefix:${devPart};ReplacePathRegex: ^${devPart}(.*) /NAV/`$1"
+$soapRule="PathPrefix:${soapPart};ReplacePathRegex: ^${soapPart}(.*) /BC/WS/`$1"
+$restRule="PathPrefix:${restPart};ReplacePathRegex: ^${restPart}(.*) /BC/OData/`$1"
+$devRule="PathPrefix:${devPart};ReplacePathRegex: ^${devPart}(.*) /BC/`$1"
 $dlRule="PathPrefixStrip:${dlPart}"
 
 $folders = "folders=c:\run\my=https://github.com/tfenster/BC-Swarm/archive/master.zip\BC-Swarm-master"
