@@ -75,9 +75,9 @@ docker service create `
 --label "traefik.dl.frontend.rule=$dlRule" --label "traefik.dl.port=8080" `
 --label "traefik.enable=true" --label "traefik.frontend.entryPoints=https" `
 --secret "src=bc_swarm_applicationId,target=c:\ConfigsAndSecrets\bc_swarm_applicationId" `
---secret "src=bc_swarm_subscriptionId,target=c:\ConfigsAndSecrets\bc_swarm_subscriptionId" `
 --secret "src=bc_swarm_accountSecret,target=c:\ConfigsAndSecrets\bc_swarm_accountSecret" `
 --secret "src=bc_swarm_accountSecretkey,target=c:\ConfigsAndSecrets\bc_swarm_accountSecretkey" `
+--config "src=bc_swarm_subscriptionId,target=c:\ConfigsAndSecrets\bc_swarm_subscriptionId" `
 --config "src=bc_swarm_tenantId,target=c:\ConfigsAndSecrets\bc_swarm_tenantId" `
 --config "src=bc_swarm_resourceGroup,target=c:\ConfigsAndSecrets\bc_swarm_resourceGroup" `
 --config "src=bc_swarm_serverName,target=c:\ConfigsAndSecrets\bc_swarm_serverName" `
