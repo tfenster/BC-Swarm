@@ -39,7 +39,7 @@ $psCred = New-Object System.Management.Automation.PSCredential($ApplicationId , 
 
 Write-Host "Azure login"
 Connect-AzAccount -Credential $psCred -TenantId $TenantId -ServicePrincipal
-Select-AzSubscription -SubscriptionID $SubscriptionId;
+Select-AzSubscription -SubscriptionID $SubscriptionId
 
 Get-AzSqlDatabase -ResourceGroupName $ResourceGroup -ServerName $ServerName -DatabaseName $DatabaseName -ErrorAction Continue -errorVariable notThere 2>&1
 if ($notThere) {
