@@ -64,6 +64,7 @@ Install-Module -Name Az -AllowClobber -Force
 Connect-AzAccount
 
 $account = New-AzADServicePrincipal -Scope "/subscriptions/$subscriptionId/resourceGroups/$resourceGroup/providers/Microsoft.Sql/servers/$sqlServerName"
+New-AzRoleAssignment -Scope "/subscriptions/$subscriptionId" -RoleDefinitionName "Reader" -ApplicationId $account.ApplicationId
 $applicationId = $account.ApplicationId
 
 $Key = @()
@@ -81,6 +82,7 @@ Set-DockerSecret -secretName bc_swarm_accountSecret -secretValue $accountSecret
 Set-DockerSecret -secretName bc_swarm_accountSecretkey -secretValue $keyAsString
 
 Set-DockerConfig -configName bc_swarm_tenantId -configValue $tenantId
+Set-DockerConfig -configName bc_swarm_subscriptionId -configValue $subscriptionId
 Set-DockerConfig -configName bc_swarm_resourceGroup -configValue $resourceGroup
 Set-DockerConfig -configName bc_swarm_serverName -configValue $sqlServerName
 Set-DockerConfig -configName bc_swarm_poolName -configValue $poolName
