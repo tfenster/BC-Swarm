@@ -98,7 +98,7 @@ Set-DockerConfig -configName bc_swarm_poolName -configValue $poolName
 Set-DockerConfig -configName bc_swarm_originalResourceGroup -configValue $originalResourceGroup
 Set-DockerConfig -configName bc_swarm_originalServerName -configValue $originalSqlServerName
 
-docker secret rm bc_swarm_applicationId 
+<#docker secret rm bc_swarm_applicationId 
 docker secret rm bc_swarm_accountSecret 
 docker secret rm bc_swarm_accountSecretkey 
 
@@ -108,4 +108,4 @@ docker config rm bc_swarm_resourceGroup
 docker config rm bc_swarm_serverName
 docker config rm bc_swarm_poolName
 docker config rm bc_swarm_originalResourceGroup
-docker config rm bc_swarm_originalServerName
+docker config rm bc_swarm_originalServerName#>
