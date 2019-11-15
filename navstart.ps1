@@ -19,6 +19,7 @@ $overallStopwatch =  [system.diagnostics.stopwatch]::StartNew()
 $ApplicationId = Get-SecretOrConfigValue -Name "bc_swarm_applicationId"
 $KeyAsString = Get-SecretOrConfigValue -Name "bc_swarm_accountSecretkey"
 $TenantId = Get-SecretOrConfigValue -Name "bc_swarm_tenantId"
+$SubscriptionId = Get-SecretOrConfigValue -Name "bc_swarm_subscriptionId"
 $Secret = Get-SecretOrConfigValue -Name "bc_swarm_accountSecret"
 $ResourceGroup = Get-SecretOrConfigValue -Name "bc_swarm_resourceGroup"
 $ServerName = Get-SecretOrConfigValue -Name "bc_swarm_serverName"
@@ -38,6 +39,7 @@ $psCred = New-Object System.Management.Automation.PSCredential($ApplicationId , 
 
 Write-Host "Azure login"
 Connect-AzAccount -Credential $psCred -TenantId $TenantId -ServicePrincipal
+Set-AzContext -subscriptionId $SubscriptionId
 
 Get-AzSqlDatabase -ResourceGroupName $ResourceGroup -ServerName $ServerName -DatabaseName $DatabaseName -ErrorAction Continue -errorVariable notThere 2>&1
 if ($notThere) {
