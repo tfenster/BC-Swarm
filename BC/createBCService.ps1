@@ -65,7 +65,7 @@ docker service create `
 --name $name --health-start-period 900s --health-timeout 900s --network $network --hostname $hostname `
 -e accept_eula=y -e accept_outdated=y -e usessl=n -e webserverinstance=$name -e publicdnsname=$publicDnsName -e $customNavSettings `
 -e "$folders" `
--e "databaseserver=$databaseServer" -e "databasename=$name" -e "databaseinstance=" `
+-e "databaseserver=$databaseServer.database.windows.net" -e "databasename=$name" -e "databaseinstance=" `
 -e "databaseusername=$databaseUserName" -e "databasepassword=$databasePassword" `
 -e "username=$navUserName" -e "password=$navPassword" `
 --label "traefik.web.frontend.rule=$webclientRule" --label "traefik.web.port=80" `
@@ -75,6 +75,7 @@ docker service create `
 --label "traefik.dl.frontend.rule=$dlRule" --label "traefik.dl.port=8080" `
 --label "traefik.enable=true" --label "traefik.frontend.entryPoints=https" `
 --secret "src=bc_swarm_applicationId,target=c:\ConfigsAndSecrets\bc_swarm_applicationId" `
+--secret "src=bc_swarm_subscriptionId,target=c:\ConfigsAndSecrets\bc_swarm_subscriptionId" `
 --secret "src=bc_swarm_accountSecret,target=c:\ConfigsAndSecrets\bc_swarm_accountSecret" `
 --secret "src=bc_swarm_accountSecretkey,target=c:\ConfigsAndSecrets\bc_swarm_accountSecretkey" `
 --config "src=bc_swarm_tenantId,target=c:\ConfigsAndSecrets\bc_swarm_tenantId" `
