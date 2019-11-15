@@ -25,6 +25,7 @@ $ResourceGroup = Get-SecretOrConfigValue -Name "bc_swarm_resourceGroup"
 $ServerName = Get-SecretOrConfigValue -Name "bc_swarm_serverName"
 $PoolName = Get-SecretOrConfigValue -Name "bc_swarm_poolName"
 $OriginalDatabaseName = Get-SecretOrConfigValue -Name "bc_swarm_originalDatabaseName"
+$OriginalResourceGroup = Get-SecretOrConfigValue -Name "bc_swarm_originalResourceGroup"
 
 $KeyStringArray = $KeyAsString.Split(",")
 [array]$Key = foreach($number in $KeyStringArray) {([int]::parse($number))}
@@ -45,7 +46,7 @@ Get-AzSqlDatabase -ResourceGroupName $ResourceGroup -ServerName $ServerName -Dat
 if ($notThere) {
     Write-Host "Create database copy"
     $stopwatch =  [system.diagnostics.stopwatch]::StartNew()
-    New-AzSqlDatabaseCopy -ResourceGroupName $ResourceGroup -ServerName $ServerName -DatabaseName $OriginalDatabaseName -CopyResourceGroupName $ResourceGroup -CopyServerName $ServerName -CopyDatabaseName $DatabaseName -ElasticPoolName $PoolName
+    New-AzSqlDatabaseCopy -ResourceGroupName $OriginalResourceGroup -ServerName $ServerName -DatabaseName $OriginalDatabaseName -CopyResourceGroupName $ResourceGroup -CopyServerName $ServerName -CopyDatabaseName $DatabaseName -ElasticPoolName $PoolName
     $stopwatch.Stop()
     Write-Host ("Creating the copy took {0} minutes" -f $stopwatch.Elapsed.Minutes)
 } else {
