@@ -37,10 +37,8 @@ Install-Module -Name Az -AllowClobber -Force
 
 $psCred = New-Object System.Management.Automation.PSCredential($ApplicationId , (ConvertTo-SecureString -String $Secret -Key $Key))
 
-Write-Host "Azure login to tenant $TenantId"
-Connect-AzAccount -Credential $psCred -TenantId $TenantId -ServicePrincipal
-Write-Host "Selecting subscription $SubscriptionId"
-Select-AzSubscription -SubscriptionID $SubscriptionId
+Write-Host "Azure login to tenant $TenantId, subscription $SubscriptionId"
+Connect-AzAccount -Credential $psCred -TenantId $TenantId -ServicePrincipal -Subscription $SubscriptionId
 
 Write-Host "Check if database exists"
 Get-AzSqlDatabase -ResourceGroupName $ResourceGroup -ServerName $ServerName -DatabaseName $DatabaseName -ErrorAction Continue -errorVariable notThere 2>&1
