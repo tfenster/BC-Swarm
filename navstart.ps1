@@ -24,8 +24,8 @@ $Secret = Get-SecretOrConfigValue -Name "bc_swarm_accountSecret"
 $ResourceGroup = Get-SecretOrConfigValue -Name "bc_swarm_resourceGroup"
 $ServerName = Get-SecretOrConfigValue -Name "bc_swarm_serverName"
 $PoolName = Get-SecretOrConfigValue -Name "bc_swarm_poolName"
-$OriginalDatabaseName = Get-SecretOrConfigValue -Name "bc_swarm_originalDatabaseName"
 $OriginalResourceGroup = Get-SecretOrConfigValue -Name "bc_swarm_originalResourceGroup"
+$OriginalServerName = Get-SecretOrConfigValue -Name "bc_swarm_originalServerName"
 
 $KeyStringArray = $KeyAsString.Split(",")
 [array]$Key = foreach($number in $KeyStringArray) {([int]::parse($number))}
@@ -41,12 +41,13 @@ $psCred = New-Object System.Management.Automation.PSCredential($ApplicationId , 
 Write-Host "Azure login to tenant $TenantId, subscription $SubscriptionId"
 Connect-AzAccount -Credential $psCred -TenantId $TenantId -ServicePrincipal -Subscription $SubscriptionId
 
-Write-Host "Check if database exists"
+Write-Host "Check if target database exists"
 Get-AzSqlDatabase -ResourceGroupName $ResourceGroup -ServerName $ServerName -DatabaseName $DatabaseName -ErrorAction Continue -errorVariable notThere 2>&1
 if ($notThere) {
     Write-Host "Create database copy"
+    $OriginalDatabaseName = "$env:OriginalDatabaseName"
     $stopwatch =  [system.diagnostics.stopwatch]::StartNew()
-    New-AzSqlDatabaseCopy -ResourceGroupName $OriginalResourceGroup -ServerName $ServerName -DatabaseName $OriginalDatabaseName -CopyResourceGroupName $ResourceGroup -CopyServerName $ServerName -CopyDatabaseName $DatabaseName -ElasticPoolName $PoolName
+    New-AzSqlDatabaseCopy -ResourceGroupName $OriginalResourceGroup -ServerName $OriginalServerName -DatabaseName $OriginalDatabaseName -CopyResourceGroupName $ResourceGroup -CopyServerName $ServerName -CopyDatabaseName $DatabaseName -ElasticPoolName $PoolName
     $stopwatch.Stop()
     Write-Host ("Creating the copy took {0} minutes" -f $stopwatch.Elapsed.Minutes)
 } else {
