@@ -27,7 +27,7 @@ $PoolName = Get-SecretOrConfigValue -Name "bc_swarm_poolName"
 $OriginalResourceGroup = Get-SecretOrConfigValue -Name "bc_swarm_originalResourceGroup"
 $OriginalServerName = Get-SecretOrConfigValue -Name "bc_swarm_originalServerName"
 
-$env:DatabaseServer="$databaseServer.database.windows.net"
+$env:DatabaseServer="$ServerName.database.windows.net"
 $env:DatabaseInstance=""
 
 $KeyStringArray = $KeyAsString.Split(",")
