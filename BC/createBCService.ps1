@@ -50,8 +50,7 @@ docker service create `
 --name $name --health-start-period 900s --health-timeout 900s --network $network --hostname $hostname `
 -e accept_eula=y -e accept_outdated=y -e usessl=n -e webserverinstance=$name -e publicdnsname=$publicDnsName -e $customNavSettings `
 -e "$folders" `
--e "databasename=$name" `
--e "databaseusername=$databaseUserName" -e "databasepassword=$databasePassword" -e "OriginalDatabaseName=$originalDatabaseName" `
+-e "databasename=$name" -e "OriginalDatabaseName=$originalDatabaseName" `
 -e "username=$name" -e "password=$navPassword" `
 --label "traefik.web.frontend.rule=$webclientRule" --label "traefik.web.port=80" `
 --label "traefik.soap.frontend.rule=$soapRule" --label "traefik.soap.port=7047" `
