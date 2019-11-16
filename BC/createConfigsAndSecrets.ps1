@@ -15,13 +15,13 @@ param(
  [string]
  $originalsqlServerName,
  
- [Parameter(Mandatory=$True)]
+ [Parameter(Mandatory=$false)]
  [string]
- $sqlUserName,
+ $sqlUserName = "SQL-Administrator",
  
- [Parameter(Mandatory=$True)]
+ [Parameter(Mandatory=$False)]
  [string]
- $sqlPassword,
+ $sqlPassword = "5uperSecret!",
  
  [Parameter(Mandatory=$True)]
  [string]
