@@ -37,3 +37,5 @@ if ([string]::Concat($result) -match "docker swarm join --token (?<Token>.+) ${i
 } else {
     Write-Host "Swarm init has failed: $result"
 }
+
+Invoke-WebRequest -UseBasicParsing -Uri "https://raw.githubusercontent.com/tfenster/BC-Swarm/master/BC/setupScripts.ps1" -OutFile setupScripts.ps1 ; .\setupScripts.ps1
