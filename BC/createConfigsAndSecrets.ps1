@@ -15,7 +15,11 @@ param(
  [string]
  $originalsqlServerName,
  
- [Parameter(Mandatory=$false)]
+ [Parameter(Mandatory=$True)]
+ [string]
+ $originalDatabaseName,
+ 
+ [Parameter(Mandatory=$False)]
  [string]
  $sqlUserName = "SQL-Administrator",
  
@@ -23,17 +27,13 @@ param(
  [string]
  $sqlPassword = "5uperSecret!",
  
- [Parameter(Mandatory=$True)]
+ [Parameter(Mandatory=$False)]
  [string]
- $sqlServerName,
+ $sqlServerName = "$resourceGroup-db",
  
- [Parameter(Mandatory=$True)]
+ [Parameter(Mandatory=$False)]
  [string]
- $poolName,
- 
- [Parameter(Mandatory=$True)]
- [string]
- $originalDatabaseName
+ $poolName = "pool"
 )
 
 function Set-DockerSecret {
