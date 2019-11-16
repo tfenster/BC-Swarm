@@ -31,10 +31,6 @@ param(
 
  [Parameter(Mandatory=$True)]
  [string]
- $resourceGroupName,
-
- [Parameter(Mandatory=$True)]
- [string]
  $location,
 
  [Parameter(Mandatory=$True)]
@@ -142,6 +138,7 @@ Function ConvertPSObjectToHashtable
 # Execution begins here
 #******************************************************************************
 $ErrorActionPreference = "Stop"
+$resourceGroupName = $name
 
 if ($initial) {
     # sign in
