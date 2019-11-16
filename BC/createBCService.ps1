@@ -70,10 +70,12 @@ docker service create `
 --secret "src=bc_swarm_applicationId,target=c:\ConfigsAndSecrets\bc_swarm_applicationId" `
 --secret "src=bc_swarm_accountSecret,target=c:\ConfigsAndSecrets\bc_swarm_accountSecret" `
 --secret "src=bc_swarm_accountSecretkey,target=c:\ConfigsAndSecrets\bc_swarm_accountSecretkey" `
+--secret "src=bc_swarm_sqlPassword,target=c:\ConfigsAndSecrets\bc_swarm_sqlPassword" `
 --config "src=bc_swarm_subscriptionId,target=c:\ConfigsAndSecrets\bc_swarm_subscriptionId" `
 --config "src=bc_swarm_tenantId,target=c:\ConfigsAndSecrets\bc_swarm_tenantId" `
 --config "src=bc_swarm_resourceGroup,target=c:\ConfigsAndSecrets\bc_swarm_resourceGroup" `
 --config "src=bc_swarm_serverName,target=c:\ConfigsAndSecrets\bc_swarm_serverName" `
+--config "src=bc_swarm_sqlUserName,target=c:\ConfigsAndSecrets\bc_swarm_sqlUserName" `
 --config "src=bc_swarm_poolName,target=c:\ConfigsAndSecrets\bc_swarm_poolName" `
 --config "src=bc_swarm_originalResourceGroup,target=c:\ConfigsAndSecrets\bc_swarm_originalResourceGroup" `
 --config "src=bc_swarm_originalServerName,target=c:\ConfigsAndSecrets\bc_swarm_originalServerName" `

@@ -29,6 +29,8 @@ $OriginalServerName = Get-SecretOrConfigValue -Name "bc_swarm_originalServerName
 
 $env:DatabaseServer="$ServerName.database.windows.net"
 $env:DatabaseInstance=""
+$env:databaseusername = Get-SecretOrConfigValue -Name "bc_swarm_sqlUserName"
+$env:databasepassword = Get-SecretOrConfigValue -Name "bc_swarm_sqlPassword"
 
 $KeyStringArray = $KeyAsString.Split(",")
 [array]$Key = foreach($number in $KeyStringArray) {([int]::parse($number))}
