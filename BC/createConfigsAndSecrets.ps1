@@ -15,10 +15,6 @@ param(
  [string]
  $originalsqlServerName,
  
- [Parameter(Mandatory=$True)]
- [string]
- $originalDatabaseName,
- 
  [Parameter(Mandatory=$False)]
  [string]
  $sqlUserName = "SQL-Administrator",
