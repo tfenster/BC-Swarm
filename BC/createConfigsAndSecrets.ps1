@@ -93,7 +93,7 @@ $tenantId = (Get-AzContext).Tenant.Id
 Set-DockerSecret -secretName bc_swarm_applicationId -secretValue $applicationId
 Set-DockerSecret -secretName bc_swarm_accountSecret -secretValue $accountSecret
 Set-DockerSecret -secretName bc_swarm_accountSecretkey -secretValue $keyAsString
-Set-DockerConfig -secretName bc_swarm_sqlPassword -secretValue $sqlPassword
+Set-DockerSecret -secretName bc_swarm_sqlPassword -secretValue $sqlPassword
 
 Set-DockerConfig -configName bc_swarm_tenantId -configValue $tenantId
 Set-DockerConfig -configName bc_swarm_subscriptionId -configValue $subscriptionId
