@@ -48,16 +48,17 @@ if (-not [string]::IsNullOrEmpty($addInsUrl)) {
 
 docker service create `
 --name $name --health-start-period 900s --health-timeout 900s --network $network --hostname $hostname `
--e accept_eula=y -e accept_outdated=y -e usessl=n -e webserverinstance=$name -e publicdnsname=$publicDnsName -e $customNavSettings `
+-e accept_eula=y -e accept_outdated=y -e webserverinstance=$name -e publicdnsname=$publicDnsName -e $customNavSettings `
 -e "$folders" `
 -e "databasename=$name" -e "OriginalDatabaseName=$originalDatabaseName" `
 -e "username=$name" -e "password=$navPassword" `
---label "traefik.web.frontend.rule=$webclientRule" --label "traefik.web.port=80" `
+--label "traefik.web.frontend.rule=$webclientRule" --label "traefik.web.port=443" `
 --label "traefik.soap.frontend.rule=$soapRule" --label "traefik.soap.port=7047" `
 --label "traefik.rest.frontend.rule=$restRule" --label "traefik.rest.port=7048" `
 --label "traefik.dev.frontend.rule=$devRule" --label "traefik.dev.port=7049" `
 --label "traefik.dl.frontend.rule=$dlRule" --label "traefik.dl.port=8080" `
 --label "traefik.enable=true" --label "traefik.frontend.entryPoints=https" `
+--label "traefik.protocol=https" --label "traefik.dl.protocol=http" `
 --secret "src=bc_swarm_applicationId,target=c:\ConfigsAndSecrets\bc_swarm_applicationId" `
 --secret "src=bc_swarm_accountSecret,target=c:\ConfigsAndSecrets\bc_swarm_accountSecret" `
 --secret "src=bc_swarm_accountSecretkey,target=c:\ConfigsAndSecrets\bc_swarm_accountSecretkey" `
