@@ -75,6 +75,39 @@
         },
         "osDiskType": {
             "value": "Premium_LRS"
+        },
+        "sqlAdministratorLogin": {
+            "value": "SQL-Administrator"
+        },
+        "sqlAdministratorLoginPassword": {
+            "value": "5uperSecret!"
+        },
+        "sqlSkuName": {
+            "value": "GP_Gen5"
+        },
+        "sqlTier": {
+            "value": "GeneralPurpose"
+        },
+        "poolLimit": {
+            "value": "2"
+        },
+        "poolSize": {
+            "value": 34359738368
+        },
+        "perDatabasePerformanceMin": {
+            "value": "0"
+        },
+        "perDatabasePerformanceMax": {
+            "value": "2"
+        },
+        "zoneRedundant": {
+            "value": false
+        },
+        "licenseType": {
+            "value": "LicenseIncluded"
+        },
+        "allowAzureIps": {
+            "value": true
         }
     }
 }
