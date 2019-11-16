@@ -7,17 +7,9 @@ param(
  [string]
  $image,
  
- [Parameter(Mandatory=$True)]
- [string]
- $databaseUserName,
- 
  [Parameter(Mandatory=$False)]
  [string]
  $addInsUrl,
-
- [Parameter(Mandatory=$True)]
- [string]
- $databasePassword,
  
  [Parameter(Mandatory=$True)]
  [string]
