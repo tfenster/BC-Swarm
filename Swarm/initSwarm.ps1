@@ -39,3 +39,5 @@ if ([string]::Concat($result) -match "docker swarm join --token (?<Token>.+) ${i
 }
 
 Invoke-WebRequest -UseBasicParsing -Uri "https://raw.githubusercontent.com/tfenster/BC-Swarm/master/BC/setupScripts.ps1" -OutFile setupScripts.ps1 ; .\setupScripts.ps1
+Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force | Out-Null
+Install-Module -Name Az -AllowClobber -Force

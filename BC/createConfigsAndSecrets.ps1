@@ -70,9 +70,6 @@ function Set-DockerConfig {
   Remove-Item ".\$configName"
 }
 
-Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force | Out-Null
-Install-Module -Name Az -AllowClobber -Force
-
 Connect-AzAccount
 
 $account = New-AzADServicePrincipal -Scope "/subscriptions/$subscriptionId/resourceGroups/$resourceGroup/providers/Microsoft.Sql/servers/$sqlServerName"
