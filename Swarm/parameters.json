@@ -42,6 +42,19 @@
                         "destinationAddressPrefix": "*",
                         "destinationPortRange": "3389"
                     }
+                },
+                {
+                    "name": "WinRM",
+                    "properties": {
+                        "priority": 360,
+                        "protocol": "TCP",
+                        "access": "Allow",
+                        "direction": "Inbound",
+                        "sourceAddressPrefix": "*",
+                        "sourcePortRange": "*",
+                        "destinationAddressPrefix": "*",
+                        "destinationPortRange": "5986"
+                    }
                 }
             ]
         },

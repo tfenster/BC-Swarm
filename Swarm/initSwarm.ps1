@@ -34,6 +34,13 @@ if ([string]::Concat($result) -match "docker swarm join --token (?<Token>.+) ${i
     Start-Sleep -Seconds 10
     Invoke-WebRequest -UseBasicParsing -Uri "https://raw.githubusercontent.com/tfenster/BC-Swarm/master/Swarm/docker-compose.yml" -OutFile c:\traefik\docker-compose.yml
     Invoke-Expression "docker stack deploy -c c:\traefik\docker-compose.yml base"
+
+    New-Item -Path c:\winrm -ItemType Directory | Out-Null
+    Invoke-WebRequest -UseBasicParsing -Uri "https://raw.githubusercontent.com/Azure/azure-quickstart-templates/master/201-vm-winrm-windows/ConfigureWinRM.ps1" -OutFile "c:\winrm\ConfigureWinRM.ps1"
+    Invoke-WebRequest -UseBasicParsing -Uri "https://raw.githubusercontent.com/Azure/azure-quickstart-templates/master/201-vm-winrm-windows/makecert.exe" -OutFile "c:\winrm\makecert.exe"
+    Invoke-WebRequest -UseBasicParsing -Uri "https://raw.githubusercontent.com/Azure/azure-quickstart-templates/master/201-vm-winrm-windows/winrmconf.cmd" -OutFile "c:\winrm\winrmconf.cmd"
+    Set-Location c:\winrm
+    .\ConfigureWinRM.ps1 $externaldns
 } else {
     Write-Host "Swarm init has failed: $result"
 }
