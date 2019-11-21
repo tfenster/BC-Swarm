@@ -320,7 +320,7 @@
                 "autoUpgradeMinorVersion": true,
                 "settings": {
                     "fileUris": [
-                        "https://raw.githubusercontent.com/tfenster/BC-Swarm/master/Bare%20Swarm/initSwarm.ps1"
+                        "https://raw.githubusercontent.com/tfenster/BC-Swarm/master/Bare%20swarm/initSwarm.ps1"
                     ]
                 },
                 "protectedSettings": {
@@ -344,7 +344,7 @@
                 "autoUpgradeMinorVersion": true,
                 "settings": {
                     "fileUris": [
-                        "https://raw.githubusercontent.com/tfenster/BC-Swarm/master/Bare%20Swarm/joinSwarm.ps1"
+                        "https://raw.githubusercontent.com/tfenster/BC-Swarm/master/Bare%20swarm/joinSwarm.ps1"
                     ]
                 },
                 "protectedSettings": {
