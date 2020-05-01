@@ -1,14 +1,11 @@
 {
-    "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
         "location": {
             "type": "string"
         },
         "networkInterfaceNameMgr": {
-            "type": "string"
-        },
-        "networkInterfaceNameWorker": {
             "type": "string"
         },
         "networkSecurityGroupNameMgr": {
@@ -53,7 +50,7 @@
         "virtualMachineNameMgr": {
             "type": "string"
         },
-        "virtualMachineNameWorker": {
+        "vmssName": {
             "type": "string"
         },
         "osDiskType": {
@@ -80,45 +77,44 @@
         "images": {
             "type": "string"
         },
-        "sqlAdministratorLogin": {
+        "additionalScriptMgr": {
             "type": "string"
         },
-        "sqlAdministratorLoginPassword": {
+        "additionalScriptWorker": {
             "type": "string"
         },
-        "sqlSkuName": {
+        "builtInRoleType": {
+            "type": "string",
+            "defaultValue": "Owner"
+        },
+        "rbacGuid": {
+            "type": "string",
+            "defaultValue": "[newGuid()]",
+            "metadata": {
+                "description": "A new GUID used to identify the role assignment"
+            }
+        },
+        "vmImage": {
+            "type": "object"
+        },
+        "branch": {
             "type": "string"
         },
-        "sqlTier": {
+        "userObjectId": {
             "type": "string"
-        },
-        "poolLimit": {
-            "type": "string"
-        },
-        "poolSize": {
-            "type": "int"
-        },
-        "perDatabasePerformanceMin": {
-            "type": "string"
-        },
-        "perDatabasePerformanceMax": {
-            "type": "string"
-        },
-        "zoneRedundant": {
-            "type": "bool"
-        },
-        "licenseType": {
-            "type": "string"
-        },
-        "allowAzureIps": {
-            "type": "bool"
         }
     },
     "variables": {
+        "namingInfix": "[toLower(substring(concat(parameters('vmssName'), uniqueString(resourceGroup().id)), 0, 9))]",
         "nsgIdMgr": "[resourceId(resourceGroup().name, 'Microsoft.Network/networkSecurityGroups', parameters('networkSecurityGroupNameMgr'))]",
         "nsgIdWorker": "[resourceId(resourceGroup().name, 'Microsoft.Network/networkSecurityGroups', parameters('networkSecurityGroupNameWorker'))]",
         "vnetId": "[resourceId(resourceGroup().name,'Microsoft.Network/virtualNetworks', parameters('virtualNetworkName'))]",
-        "subnetRef": "[concat(variables('vnetId'), '/subnets/', parameters('subnetName'))]"
+        "subnetRef": "[concat(variables('vnetId'), '/subnets/', parameters('subnetName'))]",
+        "vhdContainerName": "[concat(variables('namingInfix'), 'vhd')]",
+        "Owner": "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Authorization/roleDefinitions/', '8e3af657-a8ff-443c-a75c-2fe8c4bcb635')]",
+        "Contributor": "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Authorization/roleDefinitions/', 'b24988ac-6180-42a0-ab88-20f7382dd24c')]",
+        "Reader": "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Authorization/roleDefinitions/', 'acdd72a7-3385-48ef-bd42-f606fba81ae7')]",
+        "storageAccountNamePrefix": "[toLower(concat(substring(uniqueString(resourceGroup().id), 0, 9), variables('namingInfix'), 'sa'))]"
     },
     "resources": [
         {
@@ -149,40 +145,6 @@
                 "networkSecurityGroup": {
                     "id": "[variables('nsgIdMgr')]"
                 }
-            }
-        },
-        {
-            "type": "Microsoft.Network/networkInterfaces",
-            "apiVersion": "2018-10-01",
-            "name": "[concat(parameters('networkInterfaceNameWorker'), '-', copyIndex())]",
-            "location": "[parameters('location')]",
-            "dependsOn": [
-                "[concat('Microsoft.Network/networkSecurityGroups/', parameters('networkSecurityGroupNameWorker'))]",
-                "[concat('Microsoft.Network/virtualNetworks/', parameters('virtualNetworkName'))]",
-                "[concat('Microsoft.Network/publicIpAddresses/', parameters('publicIpAddressNameWorker'), '-', copyIndex())]"
-            ],
-            "properties": {
-                "ipConfigurations": [
-                    {
-                        "name": "ipconfig1",
-                        "properties": {
-                            "subnet": {
-                                "id": "[variables('subnetRef')]"
-                            },
-                            "privateIPAllocationMethod": "Dynamic",
-                            "publicIpAddress": {
-                                "id": "[resourceId(resourceGroup().name, 'Microsoft.Network/publicIpAddresses', concat(parameters('publicIpAddressNameWorker'), '-', copyIndex()))]"
-                            }
-                        }
-                    }
-                ],
-                "networkSecurityGroup": {
-                    "id": "[variables('nsgIdWorker')]"
-                }
-            },
-            "copy": {
-                "name": "niccopy",
-                "count": "[parameters('count')]"
             }
         },
         {
@@ -231,26 +193,13 @@
             }
         },
         {
-            "type": "Microsoft.Network/publicIPAddresses",
-            "apiVersion": "2019-02-01",
-            "name": "[concat(parameters('publicIpAddressNameWorker'), '-', copyIndex())]",
-            "location": "[parameters('location')]",
-            "sku": {
-                "name": "[parameters('publicIpAddressSku')]"
-            },
-            "properties": {
-                "publicIPAllocationMethod": "[parameters('publicIpAddressType')]"
-            },
-            "copy": {
-                "name": "pipcopy",
-                "count": "[parameters('count')]"
-            }
-        },
-        {
             "type": "Microsoft.Compute/virtualMachines",
             "apiVersion": "2018-10-01",
             "name": "[parameters('virtualMachineNameMgr')]",
             "location": "[parameters('location')]",
+            "identity": { 
+                "type": "SystemAssigned"
+            },
             "dependsOn": [
                 "[concat('Microsoft.Network/networkInterfaces/', parameters('networkInterfaceNameMgr'))]"
             ],
@@ -265,12 +214,7 @@
                             "storageAccountType": "[parameters('osDiskType')]"
                         }
                     },
-                    "imageReference": {
-                        "publisher": "MicrosoftWindowsServer",
-                        "offer": "WindowsServer",
-                        "sku": "2019-Datacenter-with-Containers",
-                        "version": "latest"
-                    }
+                    "imageReference": "[parameters('vmImage')]"
                 },
                 "networkProfile": {
                     "networkInterfaces": [
@@ -291,51 +235,137 @@
             }
         },
         {
-            "type": "Microsoft.Compute/virtualMachines",
-            "apiVersion": "2018-10-01",
-            "name": "[concat(parameters('virtualMachineNameWorker'), '-', copyIndex())]",
-            "location": "[parameters('location')]",
-            "dependsOn": [
-                "[concat('Microsoft.Network/networkInterfaces/', parameters('networkInterfaceNameWorker'), '-', copyIndex())]"
-            ],
+            "apiVersion": "2017-09-01",
+            "type": "Microsoft.Authorization/roleAssignments",
+            "name": "[parameters('rbacGuid')]",
             "properties": {
-                "hardwareProfile": {
-                    "vmSize": "[parameters('virtualMachineSizeWorker')]"
-                },
-                "storageProfile": {
-                    "osDisk": {
-                        "createOption": "FromImage",
-                        "managedDisk": {
-                            "storageAccountType": "[parameters('osDiskType')]"
-                        }
-                    },
-                    "imageReference": {
-                        "publisher": "MicrosoftWindowsServer",
-                        "offer": "WindowsServer",
-                        "sku": "2019-Datacenter-with-Containers",
-                        "version": "latest"
-                    }
-                },
-                "networkProfile": {
-                    "networkInterfaces": [
-                        {
-                            "id": "[resourceId('Microsoft.Network/networkInterfaces', concat(parameters('networkInterfaceNameWorker'), '-', copyIndex()))]"
-                        }
-                    ]
-                },
-                "osProfile": {
-                    "computerName": "[concat(parameters('virtualMachineNameWorker'), '-', copyIndex())]",
-                    "adminUsername": "[parameters('adminUsername')]",
-                    "adminPassword": "[parameters('adminPassword')]",
-                    "windowsConfiguration": {
-                        "enableAutomaticUpdates": true,
-                        "provisionVmAgent": true
-                    }
-                }
+                "roleDefinitionId": "[variables(parameters('builtInRoleType'))]",
+                "principalId": "[reference(concat('Microsoft.Compute/virtualMachines/', parameters('virtualMachineNameMgr')), '2017-12-01', 'Full').identity.principalId]",
+                "scope": "[resourceGroup().id]"
+            },
+             "dependsOn": [
+                "[concat('Microsoft.Compute/virtualMachines/', parameters('virtualMachineNameMgr'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Storage/storageAccounts",
+            "name": "[concat(variables('storageAccountNamePrefix'), copyIndex())]",
+            "location": "[parameters('location')]",
+            "apiVersion": "2019-06-01",
+            "kind": "Storage",
+            "sku": {
+                "name": "Premium_LRS"
             },
             "copy": {
-                "name": "vmcopy",
-                "count": "[parameters('count')]"
+                "name": "storageLoop",
+                "count": 5
+            },
+            "properties": {}
+        },
+        {
+            "name": "[parameters('vmssName')]",
+            "type": "Microsoft.Compute/virtualMachineScaleSets",
+            "apiVersion": "2019-07-01",
+            "location": "[parameters('location')]",
+            "dependsOn": [
+                "[variables('vnetId')]",
+                "[variables('nsgIdWorker')]",
+                "[concat('Microsoft.Compute/virtualMachines/', parameters('virtualMachineNameMgr'))]",
+                "[concat('Microsoft.Storage/storageAccounts/', concat(variables('storageAccountNamePrefix'), '0'))]",
+                "[concat('Microsoft.Storage/storageAccounts/', concat(variables('storageAccountNamePrefix'), '1'))]",
+                "[concat('Microsoft.Storage/storageAccounts/', concat(variables('storageAccountNamePrefix'), '2'))]",
+                "[concat('Microsoft.Storage/storageAccounts/', concat(variables('storageAccountNamePrefix'), '3'))]",
+                "[concat('Microsoft.Storage/storageAccounts/', concat(variables('storageAccountNamePrefix'), '4'))]"
+            ],
+            "sku": {
+                "name": "[parameters('virtualMachineSizeWorker')]",
+                "tier": "Standard",
+                "capacity": "[int(parameters('count'))]"
+            },
+            "properties": {
+                "overprovision": true,
+                "upgradePolicy": {
+                    "mode": "Manual"
+                },
+                "singlePlacementGroup": true,
+                "virtualMachineProfile": {
+                    "storageProfile": {
+                        "imageReference": "[parameters('vmImage')]",
+                        "osDisk": {
+                            "createOption": "fromImage",
+                            "caching": "ReadWrite",
+                            "name": "[concat(variables('namingInfix'), 'osdisk')]",
+                            "vhdContainers": [
+                                "[concat(reference(concat('Microsoft.Storage/storageAccounts/', concat(variables('storageAccountNamePrefix'), '0')), '2019-06-01').primaryEndpoints.blob, variables('vhdContainerName'))]",
+                                "[concat(reference(concat('Microsoft.Storage/storageAccounts/', concat(variables('storageAccountNamePrefix'), '1')), '2019-06-01').primaryEndpoints.blob, variables('vhdContainerName'))]",
+                                "[concat(reference(concat('Microsoft.Storage/storageAccounts/', concat(variables('storageAccountNamePrefix'), '2')), '2019-06-01').primaryEndpoints.blob, variables('vhdContainerName'))]",
+                                "[concat(reference(concat('Microsoft.Storage/storageAccounts/', concat(variables('storageAccountNamePrefix'), '3')), '2019-06-01').primaryEndpoints.blob, variables('vhdContainerName'))]",
+                                "[concat(reference(concat('Microsoft.Storage/storageAccounts/', concat(variables('storageAccountNamePrefix'), '4')), '2019-06-01').primaryEndpoints.blob, variables('vhdContainerName'))]"
+                            ]
+                        }
+                    },
+                    "priority": "Regular",
+                    "osProfile": {
+                        "computerNamePrefix": "[variables('namingInfix')]",
+                        "adminUsername": "[parameters('adminUsername')]",
+                        "adminPassword": "[parameters('adminPassword')]"
+                    },
+                    "networkProfile": {
+                        "networkInterfaceConfigurations": [
+                            {
+                                "name": "[concat(parameters('vmssName'), 'Nic')]",
+                                "properties": {
+                                    "primary": true,
+                                    "enableAcceleratedNetworking": true,
+                                    "ipConfigurations": [
+                                        {
+                                            "name": "[concat(parameters('vmssName'), 'IpConfig')]",
+                                            "properties": {
+                                                "subnet": {
+                                                    "id": "[variables('subnetRef')]"
+                                                },
+                                                "publicIpAddressConfiguration": {
+                                                    "name": "[parameters('publicIpAddressNameWorker')]",
+                                                    "properties": {
+                                                        "idleTimeoutInMinutes": 15
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    ],
+                                    "networkSecurityGroup": {
+                                        "id": "[variables('nsgIdWorker')]"
+                                    }
+                                }
+                            }
+                        ]
+                    },
+                    "extensionProfile": {
+                        "extensions": [
+                            {
+                                "name": "CustomVMSSScript",
+                                "properties": {
+                                    "publisher": "Microsoft.Compute",
+                                    "type": "CustomScriptExtension",
+                                    "typeHandlerVersion": "1.9",
+                                    "autoUpgradeMinorVersion": true,
+                                    "settings": {
+                                        "fileUris": [
+                                            "[concat('https://raw.githubusercontent.com/tfenster/BC-Swarm/', parameters('branch'), '/Swarm/workerSetupTasks.ps1')]"
+                                        ]
+                                    },
+                                    "protectedSettings": {
+                                        "commandToExecute": "[concat('powershell -ExecutionPolicy Unrestricted -File workerSetupTasks.ps1 -images \"', parameters('images'), '\" -branch ', parameters('branch'), ' -additionalScript \"', parameters('additionalScriptWorker'), '\" -resourceGroupName ', resourceGroup().name)]"
+                                    }
+                                }
+                            }
+                        ]
+                    }
+                },
+                "platformFaultDomainCount": 5
+            },
+            "identity": {
+                "type": "systemAssigned"
             }
         },
         {
@@ -343,7 +373,8 @@
             "apiVersion": "2015-06-15",
             "name": "[concat(parameters('virtualMachineNameMgr'),'/script1')]",
             "dependsOn": [
-                "[concat('Microsoft.Compute/virtualMachines/', parameters('virtualMachineNameMgr'))]"
+                "[concat('Microsoft.Compute/virtualMachines/', parameters('virtualMachineNameMgr'))]",
+                "[concat('Microsoft.KeyVault/vaults/SwarmVault-', resourceGroup().name)]"
             ],
             "location": "[resourceGroup().location]",
             "properties": {
@@ -353,91 +384,114 @@
                 "autoUpgradeMinorVersion": true,
                 "settings": {
                     "fileUris": [
-                        "https://raw.githubusercontent.com/tfenster/BC-Swarm/master/Swarm/initSwarm.ps1"
+                        "[concat('https://raw.githubusercontent.com/tfenster/BC-Swarm/', parameters('branch'), '/Swarm/mgrInitSwarmAndSetupTasks.ps1')]"
                     ]
-                },
-                "protectedSettings": {
-                    "commandToExecute": "[concat('powershell -ExecutionPolicy Unrestricted -File initSwarm.ps1 -externaldns ', reference(parameters('publicIPAddressNameMgr')).dnsSettings.fqdn, ' -email ', parameters('email'))]"
-                  }
-            }
-        },
-        {
-            "type": "Microsoft.Compute/virtualMachines/extensions",
-            "apiVersion": "2015-06-15",
-            "name": "[concat(parameters('virtualMachineNameWorker'), '-', copyIndex(),'/script1')]",
-            "dependsOn": [
-                "[concat('Microsoft.Compute/virtualMachines/', parameters('virtualMachineNameWorker'), '-', copyIndex())]",
-                "[resourceId('Microsoft.Compute/virtualMachines/extensions/', parameters('virtualMachineNameMgr'), 'script1')]"
-            ],
-            "location": "[resourceGroup().location]",
-            "properties": {
-                "publisher": "Microsoft.Compute",
-                "type": "CustomScriptExtension",
-                "typeHandlerVersion": "1.9",
-                "autoUpgradeMinorVersion": true,
-                "settings": {
-                    "fileUris": [
-                        "https://raw.githubusercontent.com/tfenster/BC-Swarm/master/Swarm/joinSwarm.ps1"
-                    ]
-                },
-                "protectedSettings": {
-                    "commandToExecute": "[concat('powershell -ExecutionPolicy Unrestricted -File joinSwarm.ps1 -images \"', parameters('images'), '\" -joinCommand \"', reference(resourceId('Microsoft.Compute/virtualMachines/extensions', parameters('virtualMachineNameMgr'), 'script1')).instanceView.substatuses[0].message, '\"')]"
-                  }
-            },
-            "copy": {
-                "name": "extcopy",
-                "count": "[parameters('count')]"
-            }
-        },
-        {
-            "type": "Microsoft.Sql/servers",
-            "apiVersion": "2015-05-01-preview",
-            "name": "[concat(resourceGroup().name,'-db')]",
-            "location": "[parameters('location')]",
-            "properties": {
-                "administratorLogin": "[parameters('sqlAdministratorLogin')]",
-                "administratorLoginPassword": "[parameters('sqlAdministratorLoginPassword')]",
-                "version": "12.0"
-            },
-            "resources": [
-                {
-                    "type": "Microsoft.Sql/servers/elasticpools",
-                    "apiVersion": "2017-10-01-preview",
-                    "name": "[concat(resourceGroup().name, '-db/pool')]",
-                    "location": "[parameters('location')]",
-                    "dependsOn": [
-                        "[concat('Microsoft.Sql/servers/', concat(resourceGroup().name,'-db'))]"
-                    ],
-                    "sku": {
-                        "name": "[parameters('sqlSkuName')]",
-                        "tier": "[parameters('sqlTier')]",
-                        "capacity": "[parameters('poolLimit')]"
-                    },
-                    "properties": {
-                        "perDatabaseSettings": {
-                            "minCapacity": "[parameters('perDatabasePerformanceMin')]",
-                            "maxCapacity": "[parameters('perDatabasePerformanceMax')]"
-                        },
-                        "maxSizeBytes": "[parameters('poolSize')]",
-                        "zoneRedundant": "[parameters('zoneRedundant')]",
-                        "licenseType": "[parameters('licenseType')]",
-                        "serverKeyType": "ServiceManaged"
-                    }
-                },
-                {
-                    "type": "firewallRules",
-                    "apiVersion": "2015-05-01-preview",
-                    "name": "AllowAllWindowsAzureIps",
-                    "location": "[parameters('location')]",
-                    "dependsOn": [
-                        "[concat('Microsoft.Sql/servers/', concat(resourceGroup().name,'-db'))]"
-                    ],
-                    "properties": {
-                        "endIpAddress": "0.0.0.0",
-                        "startIpAddress": "0.0.0.0"
-                    },
-                    "condition": "[parameters('allowAzureIps')]"
+                }, "protectedSettings": {
+                    "commandToExecute": "[concat('powershell -ExecutionPolicy Unrestricted -File mgrInitSwarmAndSetupTasks.ps1 -externaldns ', reference(parameters('publicIPAddressNameMgr')).dnsSettings.fqdn, ' -email ', parameters('email'), ' -branch ', parameters('branch'), ' -additionalScript \"', parameters('additionalScriptMgr'), '\" -resourceGroupName ', resourceGroup().name)]"
                 }
+            }
+        },
+        {
+            "apiVersion": "2018-02-14",
+            "name": "[concat('SwarmVault-', resourceGroup().name)]",
+            "location": "[parameters('location')]",
+            "type": "Microsoft.KeyVault/vaults",
+            "properties": {
+                "enabledForDeployment": true,
+                "enabledForTemplateDeployment": true,
+                "enabledForDiskEncryption": true,
+                "enableRbacAuthorization": false,
+                "accessPolicies": [
+                    {
+                        "objectId": "[parameters('userObjectId')]",
+                        "tenantId": "[subscription().tenantId]",
+                        "permissions": {
+                            "keys": [
+                                "Get",
+                                "List",
+                                "Update",
+                                "Create",
+                                "Import",
+                                "Delete",
+                                "Recover",
+                                "Backup",
+                                "Restore"
+                            ],
+                            "secrets": [
+                                "Get",
+                                "List",
+                                "Set",
+                                "Delete",
+                                "Recover",
+                                "Backup",
+                                "Restore"
+                            ],
+                            "certificates": [
+                                "Get",
+                                "List",
+                                "Update",
+                                "Create",
+                                "Import",
+                                "Delete",
+                                "Recover",
+                                "Backup",
+                                "Restore",
+                                "ManageContacts",
+                                "ManageIssuers",
+                                "GetIssuers",
+                                "ListIssuers",
+                                "SetIssuers",
+                                "DeleteIssuers"
+                            ]
+                        }
+                    },
+                    {
+                        "objectId": "[reference(concat('Microsoft.Compute/virtualMachines/', parameters('virtualMachineNameMgr')), '2017-12-01', 'Full').identity.principalId]",
+                        "tenantId": "[subscription().tenantId]",
+                        "permissions": {
+                            "keys": [],
+                            "secrets": [
+                                "Get",
+                                "List",
+                                "Set",
+                                "Delete"
+                            ],
+                            "certificates": []
+                        }
+                    },
+                    {
+                        "objectId": "[reference(concat('Microsoft.Compute/virtualMachineScaleSets/', parameters('vmssName')), '2017-12-01', 'Full').identity.principalId]",
+                        "tenantId": "[subscription().tenantId]",
+                        "permissions": {
+                            "keys": [],
+                            "secrets": [
+                                "Get",
+                                "List"
+                            ],
+                            "certificates": []
+                        }
+                    }
+                ],
+                "tenantId": "[subscription().tenantId]",
+                "sku": {
+                    "name": "Standard",
+                    "family": "A"
+                },
+                "enableSoftDelete": "false",
+                "softDeleteRetentionInDays": 90,
+                "networkAcls": {
+                    "value": {
+                        "defaultAction": "allow",
+                        "bypass": "AzureServices",
+                        "ipRules": [],
+                        "virtualNetworkRules": []
+                    }
+                }
+            },
+            "tags": {},
+            "dependsOn": [
+                "[concat('Microsoft.Compute/virtualMachines/', parameters('virtualMachineNameMgr'))]",
+                "[concat('Microsoft.Compute/virtualMachineScaleSets/', parameters('vmssName'))]"
             ]
         }
     ],

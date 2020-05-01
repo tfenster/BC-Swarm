@@ -1,0 +1,51 @@
+version: '3.7'
+
+services:
+      
+  core:
+    image: tobiasfenster/docker-automation:0.6-1809
+    volumes:
+      - type: npipe
+        source: \\.\pipe\docker_engine
+        target: \\.\pipe\docker_engine
+    environment: 
+      - publicdnsname=$externaldns
+    networks:
+      - docker-automation-network
+      - traefik-public
+    deploy:
+      placement:
+        constraints:
+          - node.role == manager
+      labels:
+        - traefik.enable=true
+        - traefik.http.routers.core.rule=Host(``$externaldns``) && PathPrefix(``/docker``)
+        - traefik.http.middlewares.core.stripprefix.prefixes=/docker
+        - traefik.http.routers.core.entrypoints=websecure
+        - traefik.http.routers.core.tls.certresolver=myresolver
+        - traefik.http.routers.core.middlewares=core@docker
+        - traefik.http.services.core.loadBalancer.server.scheme=http
+        - traefik.http.services.core.loadBalancer.server.port=5100
+  
+  agent:
+    image: tobiasfenster/docker-automation-agent:0.6-1809
+    volumes:
+      - source: '\\.\pipe\docker_engine'
+        target: '\\.\pipe\docker_engine'
+        type: npipe
+      - source: c:\programdata\navcontainerhelper
+        target: c:\programdata\navcontainerhelper
+        type: bind
+    networks:
+      - docker-automation-network
+    deploy:
+      mode: global
+      placement:
+        constraints:
+          - node.platform.os == windows
+
+networks: 
+  docker-automation-network:
+    attachable: true
+  traefik-public:
+    external: true

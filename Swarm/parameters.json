@@ -5,19 +5,6 @@
         "networkSecurityGroupRulesMgr": {
             "value": [
                 {
-                    "name": "HTTP",
-                    "properties": {
-                        "priority": 300,
-                        "protocol": "TCP",
-                        "access": "Allow",
-                        "direction": "Inbound",
-                        "sourceAddressPrefix": "*",
-                        "sourcePortRange": "*",
-                        "destinationAddressPrefix": "*",
-                        "destinationPortRange": "80"
-                    }
-                },
-                {
                     "name": "HTTPS",
                     "properties": {
                         "priority": 320,
@@ -31,7 +18,7 @@
                     }
                 },
                 {
-                    "name": "RDP",
+                    "name": "SSH",
                     "properties": {
                         "priority": 340,
                         "protocol": "TCP",
@@ -40,20 +27,7 @@
                         "sourceAddressPrefix": "*",
                         "sourcePortRange": "*",
                         "destinationAddressPrefix": "*",
-                        "destinationPortRange": "3389"
-                    }
-                },
-                {
-                    "name": "WinRM",
-                    "properties": {
-                        "priority": 360,
-                        "protocol": "TCP",
-                        "access": "Allow",
-                        "direction": "Inbound",
-                        "sourceAddressPrefix": "*",
-                        "sourcePortRange": "*",
-                        "destinationAddressPrefix": "*",
-                        "destinationPortRange": "5986"
+                        "destinationPortRange": "22"
                     }
                 }
             ]
@@ -89,38 +63,22 @@
         "osDiskType": {
             "value": "Premium_LRS"
         },
-        "sqlAdministratorLogin": {
-            "value": "SQL-Administrator"
+        "vmImage": {
+            "value": {
+                "sku": "2019-datacenter-core-with-containers",
+                "publisher": "MicrosoftWindowsServer",
+                "version": "latest",
+                "offer": "WindowsServer"
+            }
         },
-        "sqlAdministratorLoginPassword": {
-            "value": "5uperSecret!"
+        "images": {
+            "value": ""
         },
-        "sqlSkuName": {
-            "value": "GP_Gen5"
+        "additionalScriptMgr": {
+            "value": ""
         },
-        "sqlTier": {
-            "value": "GeneralPurpose"
-        },
-        "poolLimit": {
-            "value": "2"
-        },
-        "poolSize": {
-            "value": 34359738368
-        },
-        "perDatabasePerformanceMin": {
-            "value": "0"
-        },
-        "perDatabasePerformanceMax": {
-            "value": "2"
-        },
-        "zoneRedundant": {
-            "value": false
-        },
-        "licenseType": {
-            "value": "LicenseIncluded"
-        },
-        "allowAzureIps": {
-            "value": true
+        "additionalScriptWorker": {
+            "value": ""
         }
     }
 }

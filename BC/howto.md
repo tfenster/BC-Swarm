@@ -1,0 +1,2 @@
+### deployment
+.\deploy.ps1 -subscriptionId 'abc123' -location 'WestEurope' -adminPassword (ConvertTo-SecureString -String 'SuperSecret' -AsPlainText -Force) -email 'tobias.fenster@cosmoconsult.com' -numberOfWorkers 3 -branch 'master' -additionalScriptMgr 'https://raw.githubusercontent.com/tfenster/BC-Swarm/managed_identities/BC/additionalScriptMgr.ps1' -additionalScriptWorker 'https://raw.githubusercontent.com/tfenster/BC-Swarm/managed_identities/BC/additionalScriptWorker.ps1' -uploadSshPubKey -name 'bare' -initial

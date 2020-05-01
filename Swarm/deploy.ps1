@@ -75,7 +75,22 @@ param(
 
  [Parameter(Mandatory=$False)]
  [switch]
- $initial = $False
+ $initial = $False,
+
+ [Parameter(Mandatory=$False)]
+ [string]
+ $branch="master",
+
+ [Parameter(Mandatory=$False)]
+ [string]
+ $additionalScriptMgr="",
+
+ [Parameter(Mandatory=$False)]
+ [string]
+ $additionalScriptWorker="",
+
+ [switch]
+ $uploadSshPubKey
 
 )
 
@@ -171,4 +186,44 @@ else{
 
 # Start the deployment
 Write-Host "Starting deployment...";
-New-AzResourceGroupDeployment -ResourceGroupName $resourceGroupName -Name "$name-swarmdeployment" -TemplateFile .\template.json -TemplateParameterFile .\parameters.json -location $location -adminPassword $adminPassword -adminUsername $adminUser -virtualNetworkName "${resourceGroupName}-vnet" -dnsLabelPrefix "$name-swarm" -email $email -count $numberOfWorkers -images $images -virtualMachineNameMgr "$managerVmName" -publicIpAddressNameMgr "${managerVmName}-ip" -networkInterfaceNameMgr "${managerVmName}-ni" -networkSecurityGroupNameMgr "${managerVmName}-nsg" -virtualMachineSizeMgr $managerVmSize -virtualMachineNameWorker "$workerVmName" -publicIpAddressNameWorker "${workerVmName}-ip" -networkInterfaceNameWorker "${workerVmName}-ni" -networkSecurityGroupNameWorker "${workerVmName}-nsg" -virtualMachineSizeWorker $workerVmSize
+
+$userid = (Get-AzADUser -UserPrincipalName ((Get-AzContext).Account.Id)).Id
+$params = @{
+    ResourceGroupName = $resourceGroupName 
+    Name = "$name-deployment" 
+    TemplateFile = ".\template.json" 
+    TemplateParameterFile = ".\parameters.json"
+    location = $location
+    adminPassword = $adminPassword
+    adminUsername = "$adminUser"
+    virtualNetworkName = "${resourceGroupName}-vnet"
+    dnsLabelPrefix = "$name"
+    email = "$email"
+    count = $numberOfWorkers
+    virtualMachineNameMgr = "$managerVmName"
+    publicIpAddressNameMgr = "${managerVmName}-ip"
+    networkInterfaceNameMgr = "${managerVmName}-ni"
+    networkSecurityGroupNameMgr = "${managerVmName}-nsg"
+    virtualMachineSizeMgr = "$managerVmSize"
+    vmssName = "$workerVmName"
+    publicIpAddressNameWorker = "${workerVmName}-ip"
+    networkSecurityGroupNameWorker = "${workerVmName}-nsg"
+    virtualMachineSizeWorker = "$workerVmSize"
+    branch = "$branch"
+    userObjectId = $userid
+    additionalScriptMgr = $additionalScriptMgr
+    additionalScriptWorker = $additionalScriptWorker
+}
+
+if ($images -ne "") {
+    $params += @{ 
+        images = $images 
+    }
+}
+
+$deployment = New-AzResourceGroupDeployment @params
+if ($deployment.ProvisioningState -eq "Succeeded" -and $uploadSshPubKey) {
+    Write-Host "Upload SSH key"
+    $Secret = ConvertTo-SecureString -String (Get-Content "$HOME\.ssh\id_rsa.pub") -AsPlainText -Force 
+    Set-AzKeyVaultSecret -VaultName "SwarmVault-$resourceGroupName" -Name 'sshPubKey' -SecretValue $Secret    
+}
