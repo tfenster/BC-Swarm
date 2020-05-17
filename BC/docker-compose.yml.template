@@ -3,7 +3,7 @@ version: '3.7'
 services:
       
   core:
-    image: tobiasfenster/docker-automation:0.9-1809
+    image: tobiasfenster/docker-automation:0.9.1-1809
     volumes:
       - type: npipe
         source: \\.\pipe\docker_engine
@@ -26,6 +26,32 @@ services:
         - traefik.http.routers.core.middlewares=core@docker
         - traefik.http.services.core.loadBalancer.server.scheme=http
         - traefik.http.services.core.loadBalancer.server.port=5100
+
+  core-dev:
+    image: tobiasfenster/docker-automation:dev-1809
+    volumes:
+      - type: npipe
+        source: \\.\pipe\docker_engine
+        target: \\.\pipe\docker_engine
+    environment: 
+      - publicdnsname=$externaldns
+      - ASPNETCORE_ENVIRONMENT=Development
+    networks:
+      - docker-automation-network
+      - traefik-public
+    deploy:
+      placement:
+        constraints:
+          - node.role == manager
+      labels:
+        - traefik.enable=true
+        - traefik.http.routers.core-dev.rule=Host(``$externaldns``) && PathPrefix(``/docker-dev``)
+        - traefik.http.middlewares.core-dev.stripprefix.prefixes=/docker-dev
+        - traefik.http.routers.core-dev.entrypoints=websecure
+        - traefik.http.routers.core-dev.tls.certresolver=myresolver
+        - traefik.http.routers.core-dev.middlewares=core-dev@docker
+        - traefik.http.services.core-dev.loadBalancer.server.scheme=http
+        - traefik.http.services.core-dev.loadBalancer.server.port=5100
   
   agent:
     image: tobiasfenster/docker-automation-agent:0.9-1809
