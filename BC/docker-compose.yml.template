@@ -3,7 +3,7 @@ version: '3.7'
 services:
       
   core:
-    image: tobiasfenster/docker-automation:0.9.1-1809
+    image: tobiasfenster/docker-automation:0.9.1.1-1809
     volumes:
       - type: npipe
         source: \\.\pipe\docker_engine
@@ -54,7 +54,7 @@ services:
         - traefik.http.services.core-dev.loadBalancer.server.port=5100
   
   agent:
-    image: tobiasfenster/docker-automation-agent:0.9-1809
+    image: tobiasfenster/docker-automation-agent:0.9.1.1-1809
     volumes:
       - source: '\\.\pipe\docker_engine'
         target: '\\.\pipe\docker_engine'
