@@ -19,7 +19,7 @@ if (-not $restart) {
     Format-Volume -DriveLetter S -FileSystem NTFS -Confirm:$false#>
 
     # relocate docker data
-    <#Stop-Service docker
+    Stop-Service docker
     New-Item -Path 'd:\dockerdata' -ItemType Directory | Out-Null
     $dockerDaemonConfig = @"
 {
@@ -27,7 +27,7 @@ if (-not $restart) {
 }
 "@
     $dockerDaemonConfig | Out-File "c:\programdata\docker\config\daemon.json" -Encoding ascii
-    Start-Service docker#>
+    Start-Service docker
 
     # configure page file
     $pagefile = Get-WmiObject -Query "Select * From Win32_PageFileSetting"
